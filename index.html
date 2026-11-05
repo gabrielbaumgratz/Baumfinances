@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f4f0" />
+    <meta name="description" content="baum: suas finanças pessoais, simples. Contas, gastos fixos, planos e lista de desejos." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="baum" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>baum</title>
+    <script>
+      // apply theme before paint to avoid a flash
+      try {
+        var s = JSON.parse(localStorage.getItem("baum:v2") || "{}").settings || {};
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+        if (s.bigText) document.documentElement.setAttribute("data-text", "big");
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <noscript>Ative o JavaScript para usar o baum.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
