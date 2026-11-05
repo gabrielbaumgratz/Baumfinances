@@ -98,14 +98,23 @@ O Prumo lê arquivos **OFX** e **CSV**, os formatos de exportação mais comuns 
 ### Como exportar o extrato do banco
 Cada banco tem um caminho diferente, mas em geral fica no app ou no internet banking, em uma opção como *Extrato > Exportar* ou *Compartilhar extrato*. Escolha o formato **OFX** quando houver. Se só houver CSV, também funciona.
 
-## Instalar como aplicativo
+## Instalar
 
-O Prumo é um PWA: depois de instalado, abre em tela cheia e funciona sem internet.
+### Android (APK)
+1. Baixe o arquivo `Prumo.apk` na página de [Releases](../../releases) do projeto.
+2. Abra o arquivo no celular. Se o Android pedir, permita a instalação de apps desta fonte.
+3. Pronto. O app funciona offline e os dados ficam só no aparelho.
+
+### iPhone e iPad
+Ainda não há versão publicada em loja. Enquanto isso, use a versão web instalada na tela de início (veja abaixo), que funciona offline como um app.
+
+### Versão web (qualquer aparelho)
+O Prumo também roda direto no navegador e pode ser instalado como app (PWA).
 
 | Aparelho | Como instalar |
 | --- | --- |
 | **iPhone e iPad** (Safari) | Toque em **Compartilhar** e depois em **Adicionar à Tela de Início**. |
-| **Android** (Chrome) | Toque no menu **⋮** e depois em **Instalar app** ou **Adicionar à tela inicial**. |
+| **Android** (Chrome) | Toque no menu **⋮** e depois em **Instalar app**. |
 | **Computador** (Chrome ou Edge) | Clique no ícone de instalação na barra de endereço. |
 
 ## Privacidade e segurança
@@ -118,9 +127,13 @@ O Prumo foi pensado para seguir os princípios da **LGPD** (Lei nº 13.709/2018)
 - **Bloqueio automático** depois de um tempo em segundo plano, configurável, e espera progressiva após tentativas erradas.
 - **Ocultar valores** com um toque, para abrir o app em público.
 - **Política de segurança de conteúdo (CSP)** que só permite recursos do próprio app.
+- **Exportação criptografada** com senha, usando a mesma criptografia do PIN.
+- **No Android:** dados fora do backup em nuvem e da transferência entre aparelhos, e bloqueio de capturas de tela.
+- **No iPhone:** o conteúdo fica coberto na tela de apps recentes.
+- **Sem cookies.** O app não usa cookies de nenhum tipo.
 - **Direitos do titular dentro do app:** exportar todos os dados (acesso e portabilidade), editar qualquer registro (correção) e excluir tudo de forma imediata (eliminação).
 
-> **Importante:** se você esquecer o PIN, não há como recuperar os dados. Exporte seus dados de vez em quando e guarde o arquivo em local seguro, pois ele não é criptografado.
+> **Importante:** se você esquecer o PIN, não há como recuperar os dados. Exporte seus dados de vez em quando, de preferência no formato criptografado.
 >
 > Esta seção descreve o funcionamento técnico do app e não substitui orientação jurídica.
 
@@ -136,6 +149,7 @@ A conexão direta com os bancos (Open Finance Brasil) exige um servidor e uma em
 - CSS puro com design tokens, sem biblioteca de componentes
 - Fonte Inter hospedada no próprio app
 - Web Crypto API para a criptografia
+- [Capacitor](https://capacitorjs.com) para os apps Android e iOS
 - [Vitest](https://vitest.dev) para os testes
 
 ### Rodar localmente
@@ -166,6 +180,9 @@ O app abre em `http://localhost:5173`.
 | `npm test` | Roda os testes |
 | `npm run build` | Gera a versão de produção em `dist/` |
 | `npm run preview` | Serve a versão de produção localmente |
+| `npm run android` | Gera o web, sincroniza e abre no Android Studio |
+| `npm run android:apk` | Compila um APK de debug (precisa do Android SDK) |
+| `npm run ios` | Gera o web, sincroniza e abre no Xcode |
 
 ### Publicar no GitHub Pages
 O build usa caminhos relativos, então funciona em qualquer hospedagem estática.
@@ -175,6 +192,33 @@ O build usa caminhos relativos, então funciona em qualquer hospedagem estática
 3. Em **Settings > Pages** do repositório, aponte para a origem escolhida.
 
 O bloqueio com PIN precisa de HTTPS (ou `localhost`), porque a Web Crypto API só funciona em contexto seguro. O GitHub Pages já usa HTTPS.
+
+### Apps nativos (Android e iOS)
+Os apps nativos usam [Capacitor](https://capacitorjs.com): o mesmo código web, empacotado com os arquivos dentro do app. Nada é carregado da internet.
+
+**APK automático pelo GitHub.** O workflow `.github/workflows/android.yml` compila o APK a cada push e o deixa em *Actions > execução > Artifacts*. Ao criar uma tag `v*` (por exemplo `v2.2.0`), o APK é anexado a um Release.
+
+Sem configuração, sai um APK de debug, bom para testes. Para um APK de release assinado (e o `.aab` para lojas), crie uma keystore uma única vez:
+
+```bash
+keytool -genkeypair -v -keystore prumo.jks -alias prumo -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Depois cadastre em *Settings > Secrets and variables > Actions*: `PRUMO_KEYSTORE_BASE64` (o arquivo em base64, gerado com `base64 -w0 prumo.jks`), `PRUMO_KEYSTORE_PASSWORD`, `PRUMO_KEY_ALIAS` e `PRUMO_KEY_PASSWORD`. Guarde a keystore em local seguro: sem ela não é possível publicar atualizações do app.
+
+**Compilar no próprio computador.** Precisa do [Android Studio](https://developer.android.com/studio).
+
+```bash
+npm run android
+```
+
+**iOS.** Precisa de um Mac com Xcode e de uma conta no Apple Developer Program, inclusive para lojas alternativas.
+
+```bash
+npm run ios
+```
+
+Para distribuir fora da App Store no Brasil (iOS 26.5 ou mais recente), o app passa pela notarização da Apple e é publicado em uma loja alternativa autorizada. Os passos estão na [documentação da Apple](https://developer.apple.com/support/app-distribution-in-brazil/).
 
 ### Estrutura
 
@@ -192,6 +236,9 @@ src/
   screens/         Telas
     forms/           Formulários em painel
 tests/             Testes automatizados
+android/           Projeto nativo Android
+ios/               Projeto nativo iOS
+assets/            Imagens-base dos ícones e splash nativos
 scripts/           Geração de ícones e prints
 docs/screenshots/  Imagens deste README
 ```

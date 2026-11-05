@@ -1,0 +1,89 @@
+name: Android APK
+
+# Compila o APK a cada push na main, em tags v* e quando acionado manualmente.
+# O APK fica disponível em Actions > (execução) > Artifacts.
+# Em tags v*, o APK também é anexado a um Release.
+on:
+  push:
+    branches: [main, "claude/**"]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Testes
+        run: npm test
+
+      - name: Build web e sincronizar Android
+        run: npx vite build && npx cap sync android
+
+      # Se os secrets de assinatura existirem, gera APK de release assinado.
+      # Sem eles, gera APK de debug (instalável, bom para testes).
+      - name: Preparar keystore
+        id: ks
+        env:
+          KEYSTORE_B64: ${{ secrets.PRUMO_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/prumo.jks"
+            echo "path=$RUNNER_TEMP/prumo.jks" >> "$GITHUB_OUTPUT"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compilar APK
+        working-directory: android
+        env:
+          PRUMO_KEYSTORE_PATH: ${{ steps.ks.outputs.path }}
+          PRUMO_KEYSTORE_PASSWORD: ${{ secrets.PRUMO_KEYSTORE_PASSWORD }}
+          PRUMO_KEY_ALIAS: ${{ secrets.PRUMO_KEY_ALIAS }}
+          PRUMO_KEY_PASSWORD: ${{ secrets.PRUMO_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          if [ "${{ steps.ks.outputs.signed }}" = "true" ]; then
+            ./gradlew assembleRelease bundleRelease
+            cp app/build/outputs/apk/release/app-release.apk ../Prumo.apk
+            cp app/build/outputs/bundle/release/app-release.aab ../Prumo.aab
+          else
+            ./gradlew assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk ../Prumo-debug.apk
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prumo-android
+          path: |
+            Prumo*.apk
+            Prumo*.aab
+          if-no-files-found: error
+
+      - name: Publicar no Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Prumo*.apk
+            Prumo*.aab

@@ -1,8 +1,6 @@
-import { useRef } from "react";
 import { useStore } from "../lib/store.jsx";
 import { useUI } from "../lib/ui-state.jsx";
 import { accountBalance } from "../lib/selectors.js";
-import { today } from "../lib/dates.js";
 import { cryptoAvailable } from "../lib/vault.js";
 import { APP } from "../config.js";
 import Icon from "../components/Icon.jsx";
@@ -14,34 +12,10 @@ const LOCK_OPTIONS = [
 ];
 
 export default function Settings({ go }) {
-  const { state, setSettings, init, eraseAll, hasPin, lock } = useStore();
+  const { state, setSettings, eraseAll, hasPin, lock } = useStore();
   const ui = useUI();
-  const fileRef = useRef(null);
   const s = state.settings;
   const pinOn = hasPin();
-
-  const exportData = () => {
-    const blob = new Blob([JSON.stringify({ app: APP.name, exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${APP.name.toLowerCase()}-dados-${today()}.json`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    ui.toast("Arquivo exportado");
-  };
-
-  const restore = async (f) => {
-    if (!f) return;
-    if (f.size > 20 * 1024 * 1024) return ui.toast("Arquivo grande demais");
-    try {
-      const data = JSON.parse(await f.text());
-      if (!confirm("Substituir os dados atuais pelos dados do arquivo?")) return;
-      init({ ...data, settings: { ...data.settings, consentAt: s.consentAt, policyVersion: s.policyVersion } });
-      ui.toast("Dados restaurados");
-    } catch {
-      ui.toast("Arquivo inválido");
-    }
-  };
 
   return (
     <div className="page narrow">
@@ -122,9 +96,8 @@ export default function Settings({ go }) {
           <div style={{ borderTop: "1px solid var(--line)" }}>
             <button className="set" onClick={() => ui.open("category")}><div className="body"><div className="t">Categorias e limites</div><div className="d">Defina um limite mensal por categoria</div></div></button>
             <button className="set" onClick={() => ui.open("import")}><div className="body"><div className="t">Importar extrato</div><div className="d">Arquivo OFX ou CSV do seu banco</div></div></button>
-            <button className="set" onClick={exportData}><div className="body"><div className="t">Exportar dados</div><div className="d">Arquivo JSON com todas as informações. Não é criptografado.</div></div></button>
-            <button className="set" onClick={() => fileRef.current?.click()}><div className="body"><div className="t">Restaurar dados</div><div className="d">A partir de um arquivo exportado</div></div></button>
-            <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => { restore(e.target.files[0]); e.target.value = ""; }} />
+            <button className="set" onClick={() => ui.open("backup", { mode: "export" })}><div className="body"><div className="t">Exportar dados</div><div className="d">Cópia de todas as informações, com opção de criptografia</div></div></button>
+            <button className="set" onClick={() => ui.open("backup", { mode: "restore" })}><div className="body"><div className="t">Restaurar dados</div><div className="d">A partir de um arquivo exportado</div></div></button>
             <button className="set" onClick={() => {
               if (confirm("Excluir todos os dados deste aparelho? Esta ação não pode ser desfeita.")) { eraseAll(); location.hash = ""; }
             }}><div className="body"><div className="t danger-text">Excluir todos os dados</div><div className="d">Remove tudo deste aparelho, imediatamente</div></div></button>

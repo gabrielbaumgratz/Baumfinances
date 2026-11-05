@@ -134,3 +134,21 @@ describe("normalize", () => {
     expect(n.settings.theme).toBe("system");
   });
 });
+
+import { buildBackup, decryptBackup, inspectBackup } from "../src/lib/backup.js";
+
+describe("backup", () => {
+  const state = { transactions: [{ id: "1", date: "2026-01-01", amount: -10, merchant: "Farmácia sigilosa" }], accounts: [] };
+  it("plain backup round-trips", async () => {
+    expect(inspectBackup(await buildBackup(state)).data).toEqual(state);
+  });
+  it("encrypted backup hides content and needs the password", async () => {
+    const text = await buildBackup(state, "senha-forte-123");
+    expect(text).not.toContain("sigilosa");
+    const r = inspectBackup(text);
+    expect(r.encrypted).toBe(true);
+    expect(await decryptBackup(r.json, "senha-forte-123")).toEqual(state);
+    await expect(decryptBackup(r.json, "errada")).rejects.toBeTruthy();
+  });
+  it("rejects unknown files", () => expect(() => inspectBackup('{"x":1}')).toThrow());
+});

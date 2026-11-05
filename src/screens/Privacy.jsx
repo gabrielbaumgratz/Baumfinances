@@ -38,10 +38,13 @@ export default function Privacy({ go, public: isPublic }) {
           <li>O app bloqueia sozinho depois de um tempo em segundo plano.</li>
           <li>A opção Ocultar valores esconde os números da tela.</li>
           <li>Importações de extrato são lidas no próprio aparelho.</li>
+          <li>A exportação de dados pode ser protegida com senha, usando a mesma criptografia.</li>
+          <li>No aplicativo para Android, os dados não entram no backup em nuvem do Google nem na transferência entre aparelhos, e a tela não pode ser capturada.</li>
+          <li>No aplicativo para iPhone, o conteúdo fica coberto na tela de apps recentes.</li>
         </ul>
         <p>
-          Nenhum sistema é totalmente imune. Proteja o aparelho com senha, mantenha o sistema atualizado e guarde o arquivo de backup em local seguro,
-          pois ele não é criptografado.
+          Nenhum sistema é totalmente imune. Proteja o aparelho com senha, mantenha o sistema atualizado e, se exportar seus dados sem
+          criptografia, guarde o arquivo em local seguro.
         </p>
 
         <h2>Seus direitos</h2>

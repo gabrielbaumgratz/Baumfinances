@@ -19,6 +19,7 @@ import AccountForm from "./screens/forms/AccountForm.jsx";
 import CategoryForm from "./screens/forms/CategoryForm.jsx";
 import ImportSheet from "./screens/forms/ImportSheet.jsx";
 import PinForm from "./screens/forms/PinForm.jsx";
+import BackupSheet from "./screens/forms/BackupSheet.jsx";
 
 const NAV = [
   { id: "inicio", label: "Início", icon: "home" },
@@ -28,7 +29,7 @@ const NAV = [
   { id: "ajustes", label: "Ajustes", icon: "settings" },
 ];
 const SCREENS = { inicio: Home, extrato: Statement, planejamento: Plans, analise: Insights, ajustes: Settings, privacidade: Privacy };
-const SHEETS = { tx: TxForm, fixed: FixedForm, plan: PlanForm, wish: WishForm, account: AccountForm, category: CategoryForm, import: ImportSheet, pin: PinForm };
+const SHEETS = { tx: TxForm, fixed: FixedForm, plan: PlanForm, wish: WishForm, account: AccountForm, category: CategoryForm, import: ImportSheet, pin: PinForm, backup: BackupSheet };
 
 function useHashRoute() {
   const read = () => {
@@ -65,7 +66,7 @@ export default function App() {
   const timer = useRef();
 
   useEffect(() => { if (state) applyPrefs(state.settings); }, [state?.settings.theme, state?.settings.bigText]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (status !== "ready") setSheet(null); }, [status]);
+  useEffect(() => { if (status !== "ready") setSheet(null); scrollTo({ top: 0 }); }, [status]);
 
   const ui = useMemo(() => ({
     open: (type, payload = {}) => setSheet({ type, payload, key: Date.now() }),

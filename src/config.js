@@ -2,7 +2,7 @@
 export const APP = {
   name: "Prumo",
   tagline: "Suas finanças no prumo.",
-  version: "2.1.0",
+  version: "2.2.0",
   policyVersion: "2026-11-05",
   // Canal de contato exibido na Política de Privacidade.
   contact: "https://github.com/gabrielbaumgratz/baumfinances/issues",
