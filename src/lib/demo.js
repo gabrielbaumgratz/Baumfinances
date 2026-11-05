@@ -11,7 +11,7 @@ export function demoState(ref = today()) {
 
   const nu = { id: uid(), name: "Conta principal", bank: "Nubank", type: "checking", color: "#6250d6", initial: 1850 };
   const inter = { id: uid(), name: "Reserva", bank: "Inter", type: "savings", color: "#eb6834", initial: 4200 };
-  const card = { id: uid(), name: "Cartão", bank: "C6 Bank", type: "credit", color: "#0e0f0c", initial: 0 };
+  const card = { id: uid(), name: "Cartão", bank: "C6 Bank", type: "credit", color: "#55554f", initial: 0 };
   s.accounts = [nu, inter, card];
 
   s.fixed = [
@@ -28,12 +28,12 @@ export function demoState(ref = today()) {
 
   const pattern = [
     [2, -38.5, "Padaria Pão Quente", "mercado", card.id],
-    [3, -23.4, "Uber", "transporte", card.id, "Chuva, não deu pra ir de ônibus"],
+    [3, -23.4, "Uber", "transporte", card.id, "Chuva"],
     [4, -186.2, "Supermercado BH", "mercado", nu.id, "Compra do mês"],
     [6, -42.9, "iFood", "comida", card.id],
     [8, -18.0, "Uber", "transporte", card.id],
     [9, -54.0, "Drogaria Araujo", "saude", nu.id],
-    [11, -39.9, "iFood", "comida", card.id, "Preguiça de cozinhar"],
+    [11, -39.9, "iFood", "comida", card.id, ""],
     [13, -129.9, "Shopee", "compras", card.id, "Suporte de monitor"],
     [14, -16.5, "Uber", "transporte", card.id],
     [16, -67.0, "Cinema", "lazer", card.id, "Aniversário da Ana"],
@@ -60,15 +60,15 @@ export function demoState(ref = today()) {
 
   const nextM = addMonths(cur, 1);
   s.plans = [
-    { id: uid(), name: "Presente de aniversário da mãe", amount: 150, date: dayInMonth(cur.y, cur.m, Math.min(day + 6, 28)), categoryId: "presentes", certainty: "sure", done: false },
-    { id: uid(), name: "Show no Mineirão", amount: 280, date: dayInMonth(nextM.y, nextM.m, 18), categoryId: "lazer", certainty: "maybe", done: false, note: "Se sobrar grana" },
+    { id: uid(), name: "Presente de aniversário", amount: 150, date: dayInMonth(cur.y, cur.m, Math.min(day + 6, 28)), categoryId: "presentes", certainty: "sure", done: false },
+    { id: uid(), name: "Show", amount: 280, date: dayInMonth(nextM.y, nextM.m, 18), categoryId: "lazer", certainty: "maybe", done: false, note: "Se sobrar orçamento" },
     { id: uid(), name: "Rematrícula PUC", amount: 450, date: dayInMonth(nextM.y, nextM.m, 8), categoryId: "educacao", certainty: "sure", done: false },
   ];
 
   s.wishes = [
-    { id: uid(), name: "Monitor ultrawide", price: 1899, saved: 650, priority: 1, link: "", note: "Pra programar melhor" },
+    { id: uid(), name: "Monitor ultrawide", price: 1899, saved: 650, priority: 1, link: "", note: "" },
     { id: uid(), name: "Teclado mecânico", price: 420, saved: 420, priority: 2, link: "" },
-    { id: uid(), name: "Viagem pra Ouro Preto", price: 900, saved: 120, priority: 3, link: "" },
+    { id: uid(), name: "Viagem para Ouro Preto", price: 900, saved: 120, priority: 3, link: "" },
   ];
 
   s.categories = s.categories.map((c) => ({ ...c, budget: { comida: 150, mercado: 400, transporte: 100, lazer: 120 }[c.id] || 0 }));

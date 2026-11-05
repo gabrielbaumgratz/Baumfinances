@@ -1,17 +1,17 @@
-import Icon from "../../components/Icon.jsx";
-import { AccChip } from "../../components/ui.jsx";
+import { Dot } from "../../components/ui.jsx";
 import { parseMoney } from "../../lib/format.js";
 
 export function AmountInput({ value, onChange, label = "Valor", error }) {
   return (
     <div>
       <label className="sr-only" htmlFor="amount">{label}</label>
-      <div className="amount-input">
+      <div className="amount">
         <span>R$</span>
-        <input id="amount" inputMode="decimal" style={{ width: `${Math.max(4, (value || "0,00").length) + 0.5}ch` }} autoComplete="off" placeholder="0,00" value={value}
+        <input id="amount" inputMode="decimal" autoComplete="off" placeholder="0,00" value={value}
+          style={{ width: `${Math.max(4, (value || "0,00").length) + 0.5}ch` }}
           onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ""))} aria-invalid={!!error} />
       </div>
-      {error && <div className="err-text" role="alert" style={{ textAlign: "center" }}>{error}</div>}
+      {error && <div className="err" role="alert" style={{ textAlign: "center" }}>{error}</div>}
     </div>
   );
 }
@@ -20,12 +20,9 @@ export function CategoryPicker({ categories, value, onChange }) {
   return (
     <div className="field">
       <span className="label">Categoria</span>
-      <div className="cat-grid" role="group" aria-label="Categoria">
+      <div className="chips wrap" role="group" aria-label="Categoria">
         {categories.map((c) => (
-          <button key={c.id} type="button" className="cat-opt" aria-pressed={value === c.id} onClick={() => onChange(c.id)}>
-            <Icon name={c.icon} size={22} />
-            {c.name}
-          </button>
+          <button key={c.id} type="button" className="chip" aria-pressed={value === c.id} onClick={() => onChange(c.id)}>{c.name}</button>
         ))}
       </div>
     </div>
@@ -40,9 +37,7 @@ export function AccountPicker({ accounts, value, onChange, allowNone }) {
       <div className="chips wrap" role="group" aria-label="Conta">
         {allowNone && <button type="button" className="chip" aria-pressed={!value} onClick={() => onChange("")}>Nenhuma</button>}
         {accounts.map((a) => (
-          <button key={a.id} type="button" className="chip" aria-pressed={value === a.id} onClick={() => onChange(a.id)}>
-            <AccChip acc={a} size={22} />{a.name}
-          </button>
+          <button key={a.id} type="button" className="chip" aria-pressed={value === a.id} onClick={() => onChange(a.id)}><Dot color={a.color} />{a.name}</button>
         ))}
       </div>
     </div>

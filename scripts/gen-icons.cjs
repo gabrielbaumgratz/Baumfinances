@@ -1,4 +1,4 @@
-// Renders the SVG icons to PNG using the preinstalled Playwright Chromium: node scripts-gen-icons.cjs
+// Gera os PNGs dos ícones a partir dos SVGs (precisa do Playwright): node scripts/gen-icons.cjs
 const { chromium } = require("playwright");
 const fs = require("fs");
 (async () => {

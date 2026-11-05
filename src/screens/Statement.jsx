@@ -2,14 +2,15 @@ import { useMemo, useState } from "react";
 import { useStore } from "../lib/store.jsx";
 import { useUI } from "../lib/ui-state.jsx";
 import { monthSummary, txInMonth } from "../lib/selectors.js";
-import { relativeDay, today, fromISO } from "../lib/dates.js";
+import { relativeDay, today, MONTHS } from "../lib/dates.js";
 import Icon from "../components/Icon.jsx";
 import Money from "../components/Money.jsx";
 import TxRow from "../components/TxRow.jsx";
 import MonthSwitcher from "../components/MonthSwitcher.jsx";
-import { Empty } from "../components/ui.jsx";
+import { Dot, Empty } from "../components/ui.jsx";
 
 const strip = (s = "") => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 export default function Statement({ sub, go }) {
   const { state } = useStore();
@@ -39,71 +40,64 @@ export default function Statement({ sub, go }) {
   const sum = monthSummary(filtered);
   const usedCats = [...new Set(txInMonth(state.transactions, ym).map((t) => t.categoryId))];
   const ref = today();
+  const filtering = q || accId || catId || kind !== "all";
 
   return (
-    <div className="page" style={{ maxWidth: 760 }}>
+    <div className="page narrow">
       <header className="top">
         <h1>Extrato</h1>
         <div className="spacer" />
-        <button className="icon-btn" onClick={() => ui.open("import")} aria-label="Importar extrato"><Icon name="upload" /></button>
+        <button className="btn sm ghost" onClick={() => ui.open("import")}><Icon name="upload" size={16} />Importar</button>
       </header>
 
-      <div className="stack" style={{ gap: 12 }}>
-        <div className="row" style={{ flexWrap: "wrap" }}>
-          <MonthSwitcher ym={ym} onChange={setYm} />
-          <div className="spacer" />
-          <div className="num" style={{ fontSize: "0.88rem", color: "var(--muted)", textAlign: "right" }}>
-            <span className="pos"><Money value={sum.income} /></span> entrou · <Money value={sum.expense} /> saiu
-          </div>
+      <div className="row" style={{ justifyContent: "space-between", flexWrap: "wrap", marginBottom: 16, marginLeft: -10 }}>
+        <MonthSwitcher ym={ym} onChange={setYm} />
+        <div className="figures" style={{ gridTemplateColumns: "auto auto", borderTop: 0 }}>
+          <div style={{ paddingTop: 0 }}><div className="label">Entradas</div><div className="v pos"><Money value={sum.income} /></div></div>
+          <div style={{ paddingTop: 0 }}><div className="label">Saídas</div><div className="v"><Money value={sum.expense} /></div></div>
         </div>
+      </div>
 
-        <div className="search">
-          <Icon name="search" size={18} />
-          <input className="input" type="search" placeholder="Buscar por lugar, descrição ou nota" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
-        </div>
+      <div className="search" style={{ marginBottom: 12 }}>
+        <Icon name="search" size={16} />
+        <input className="input" type="search" placeholder="Buscar" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar lançamentos" />
+      </div>
 
-        <div className="chips" role="group" aria-label="Filtros">
-          {[["all", "Tudo"], ["out", "Saídas"], ["in", "Entradas"]].map(([v, l]) => (
-            <button key={v} className="chip" aria-pressed={kind === v} onClick={() => setKind(v)}>{l}</button>
-          ))}
-          <span style={{ width: 1, background: "var(--line-strong)", margin: "6px 2px" }} />
-          {state.accounts.map((a) => (
-            <button key={a.id} className="chip" aria-pressed={accId === a.id} onClick={() => go("extrato", accId === a.id ? "" : a.id)}>
-              <span className="dot" style={{ background: a.color }} />{a.name}
+      <div className="chips" role="group" aria-label="Filtros" style={{ marginBottom: 8 }}>
+        {[["all", "Todos"], ["out", "Saídas"], ["in", "Entradas"]].map(([v, l]) => (
+          <button key={v} className="chip" aria-pressed={kind === v} onClick={() => setKind(v)}>{l}</button>
+        ))}
+        {state.accounts.map((a) => (
+          <button key={a.id} className="chip" aria-pressed={accId === a.id} onClick={() => go("extrato", accId === a.id ? "" : a.id)}>
+            <Dot color={a.color} />{a.name}
+          </button>
+        ))}
+      </div>
+      {usedCats.length > 1 && (
+        <div className="chips" role="group" aria-label="Categorias" style={{ marginBottom: 24 }}>
+          {usedCats.map((id) => (
+            <button key={id} className="chip" aria-pressed={catId === id} onClick={() => setCatId(catId === id ? "" : id)}>
+              {state.categories.find((x) => x.id === id)?.name || "Sem categoria"}
             </button>
           ))}
         </div>
-        {usedCats.length > 1 && (
-          <div className="chips" role="group" aria-label="Categorias">
-            {usedCats.map((id) => {
-              const c = state.categories.find((x) => x.id === id);
-              return (
-                <button key={id} className="chip" aria-pressed={catId === id} onClick={() => setCatId(catId === id ? "" : id)}>
-                  <Icon name={c?.icon} size={16} />{c?.name || "Sem categoria"}
-                </button>
-              );
-            })}
-          </div>
-        )}
+      )}
 
-        <section className="card card-flat">
-          {groups.length ? (
-            <div className="list">
-              {groups.map(([date, items]) => (
-                <div key={date}>
-                  <div className="day-head">
-                    <span>{(() => { const r = relativeDay(date, ref); return r[0].toUpperCase() + r.slice(1); })()}{date > ref && " · agendado"}</span>
-                    <Money value={items.reduce((s, t) => s + t.amount, 0)} signed />
-                  </div>
-                  {items.map((t) => <TxRow key={t.id} tx={t} onClick={() => ui.open("tx", { item: t })} />)}
-                </div>
-              ))}
+      {groups.length ? (
+        <div>
+          {groups.map(([date, items]) => (
+            <div key={date}>
+              <div className="group-head">
+                <span>{cap(relativeDay(date, ref))}{date > ref ? ", agendado" : ""}</span>
+                <span className="num"><Money value={items.reduce((s, t) => s + t.amount, 0)} signed /></span>
+              </div>
+              {items.map((t) => <TxRow key={t.id} tx={t} onClick={() => ui.open("tx", { item: t })} />)}
             </div>
-          ) : (
-            <Empty icon="search" title="Nenhum lançamento" text={q || accId || catId || kind !== "all" ? "Tenta tirar algum filtro." : `Nada registrado em ${fromISO(`${ym.y}-${String(ym.m + 1).padStart(2, "0")}-01`).toLocaleDateString("pt-BR", { month: "long" })}.`} />
-          )}
-        </section>
-      </div>
+          ))}
+        </div>
+      ) : (
+        <Empty title="Nenhum lançamento" text={filtering ? "Nenhum resultado para os filtros escolhidos." : `Nada registrado em ${MONTHS[ym.m].toLowerCase()}.`} />
+      )}
     </div>
   );
 }

@@ -108,3 +108,29 @@ describe("selectors", () => {
     expect(monthSummary([{ amount: 10 }, { amount: -4 }])).toEqual({ income: 10, expense: 4, net: 6 });
   });
 });
+
+import { deriveKey, newSalt, open, seal } from "../src/lib/vault.js";
+import { normalize } from "../src/lib/store.jsx";
+
+describe("vault", () => {
+  it("round-trips with the right PIN and rejects a wrong one", async () => {
+    const salt = newSalt();
+    const key = await deriveKey("482913", salt, 1000);
+    const secret = { merchant: "Supermercado secreto" };
+    const v = await seal(key, salt, secret, 1000);
+    expect(atob(v.ct)).not.toContain("secreto");
+    expect(await open(key, v)).toEqual(secret);
+    const wrong = await deriveKey("000001", salt, 1000);
+    await expect(open(wrong, v)).rejects.toBeTruthy();
+  });
+});
+
+describe("normalize", () => {
+  it("rejects garbage and drops invalid rows", () => {
+    expect(() => normalize(null)).toThrow();
+    expect(() => normalize({ transactions: "x" })).toThrow();
+    const n = normalize({ transactions: [{ id: "1", date: "2026-01-01", amount: -5 }, { id: "2", date: "bad", amount: 1 }, null] });
+    expect(n.transactions).toHaveLength(1);
+    expect(n.settings.theme).toBe("system");
+  });
+});

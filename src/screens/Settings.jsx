@@ -3,122 +3,136 @@ import { useStore } from "../lib/store.jsx";
 import { useUI } from "../lib/ui-state.jsx";
 import { accountBalance } from "../lib/selectors.js";
 import { today } from "../lib/dates.js";
-import Sheet from "../components/Sheet.jsx";
+import { cryptoAvailable } from "../lib/vault.js";
+import { APP } from "../config.js";
 import Icon from "../components/Icon.jsx";
 import Money from "../components/Money.jsx";
-import Logo from "../components/Logo.jsx";
-import { AccChip, Field, Seg, Switch } from "../components/ui.jsx";
+import { Dot, Field, SectionHead, Seg, Switch } from "../components/ui.jsx";
 
-export default function Settings({ onClose }) {
-  const { state, setSettings, init, reset } = useStore();
+const LOCK_OPTIONS = [
+  { value: 0, label: "Imediato" }, { value: 1, label: "1 min" }, { value: 5, label: "5 min" }, { value: 15, label: "15 min" },
+];
+
+export default function Settings({ go }) {
+  const { state, setSettings, init, eraseAll, hasPin, lock } = useStore();
   const ui = useUI();
   const fileRef = useRef(null);
   const s = state.settings;
+  const pinOn = hasPin();
 
-  const exportBackup = () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify({ app: APP.name, exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `baum-backup-${today()}.json`;
+    a.download = `${APP.name.toLowerCase()}-dados-${today()}.json`;
     a.click();
-    URL.revokeObjectURL(a.href);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    ui.toast("Arquivo exportado");
   };
 
-  const importBackup = async (f) => {
+  const restore = async (f) => {
     if (!f) return;
+    if (f.size > 20 * 1024 * 1024) return ui.toast("Arquivo grande demais");
     try {
       const data = JSON.parse(await f.text());
-      if (!Array.isArray(data.transactions) || !Array.isArray(data.accounts)) throw new Error();
-      if (!confirm("Substituir tudo pelos dados do backup?")) return;
-      init({ ...state, ...data });
-      ui.toast("Backup restaurado");
+      if (!confirm("Substituir os dados atuais pelos dados do arquivo?")) return;
+      init({ ...data, settings: { ...data.settings, consentAt: s.consentAt, policyVersion: s.policyVersion } });
+      ui.toast("Dados restaurados");
     } catch {
-      ui.toast("Arquivo de backup inválido");
+      ui.toast("Arquivo inválido");
     }
   };
 
   return (
-    <Sheet title="Ajustes" onClose={onClose}>
-      {(close) => (
-        <>
-          <Field id="uname" label="Como quer ser chamado?">
-            <input id="uname" className="input" value={s.name} onChange={(e) => setSettings({ name: e.target.value })} placeholder="Seu nome" />
+    <div className="page narrow">
+      <header className="top"><h1>Ajustes</h1></header>
+      <div className="stack">
+        <section>
+          <SectionHead title="Perfil" />
+          <Field id="uname" label="Nome" help="Usado apenas para a saudação na tela inicial.">
+            <input id="uname" className="input" value={s.name} maxLength={60} autoComplete="given-name" onChange={(e) => setSettings({ name: e.target.value })} placeholder="Como você quer ser chamado" />
           </Field>
+        </section>
 
-          <div className="field">
-            <span className="label">Aparência</span>
-            <Seg value={s.theme} onChange={(theme) => setSettings({ theme })} label="Tema" options={[
-              { value: "light", label: "Claro" }, { value: "dark", label: "Escuro" }, { value: "system", label: "Automático" },
-            ]} />
-          </div>
-
-          <div className="card" style={{ padding: "4px 16px" }}>
-            <div className="setting-row">
-              <Icon name="text" />
-              <div className="t">Texto grande<small>Letras e botões maiores</small></div>
+        <section>
+          <SectionHead title="Aparência" />
+          <div className="stack" style={{ gap: 0 }}>
+            <div className="set" style={{ borderTop: "1px solid var(--line)" }}>
+              <div className="body"><div className="t">Tema</div></div>
+              <div style={{ width: 260 }}>
+                <Seg value={s.theme} onChange={(theme) => setSettings({ theme })} label="Tema" options={[{ value: "light", label: "Claro" }, { value: "dark", label: "Escuro" }, { value: "system", label: "Sistema" }]} />
+              </div>
+            </div>
+            <div className="set">
+              <div className="body"><div className="t">Texto grande</div><div className="d">Aumenta letras e botões</div></div>
               <Switch checked={s.bigText} onChange={(bigText) => setSettings({ bigText })} label="Texto grande" />
             </div>
-            <div className="setting-row">
-              <Icon name="eyeOff" />
-              <div className="t">Esconder valores<small>Pra abrir o app em público</small></div>
-              <Switch checked={s.hideValues} onChange={(hideValues) => setSettings({ hideValues })} label="Esconder valores" />
+          </div>
+        </section>
+
+        <section>
+          <SectionHead title="Privacidade e segurança" />
+          <div style={{ borderTop: "1px solid var(--line)" }}>
+            <div className="set">
+              <div className="body">
+                <div className="t">Bloqueio com PIN</div>
+                <div className="d">{cryptoAvailable() ? "Pede um PIN ao abrir e criptografa os dados no aparelho" : "Indisponível neste navegador"}</div>
+              </div>
+              <Switch checked={pinOn} label="Bloqueio com PIN" onChange={() => cryptoAvailable() && ui.open("pin", { mode: pinOn ? "off" : "on" })} />
             </div>
-          </div>
-
-          <div>
-            <div className="section-label">Contas e cartões</div>
-            <div className="card card-flat"><div className="list">
-              {state.accounts.map((a) => (
-                <button key={a.id} className="item" onClick={() => ui.open("account", { item: a })}>
-                  <AccChip acc={a} size={38} />
-                  <div className="main-col"><div className="title">{a.name}</div><div className="meta">{a.bank}{a.hidden && " · fora do total"}</div></div>
-                  <div className="amt"><Money value={accountBalance(a, state.transactions)} /></div>
-                </button>
-              ))}
-              <button className="item" onClick={() => ui.open("account")}>
-                <div className="ico-tile brand"><Icon name="plus" /></div>
-                <div className="main-col"><div className="title">Adicionar conta ou cartão</div></div>
-              </button>
-            </div></div>
-          </div>
-
-          <div>
-            <div className="section-label">Dados</div>
-            <div className="card" style={{ padding: "4px 16px" }}>
-              <button className="setting-row" onClick={() => ui.open("category")}>
-                <Icon name="tag" /><div className="t">Categorias e limites<small>Defina quanto quer gastar por mês</small></div><Icon name="right" size={18} />
-              </button>
-              <button className="setting-row" onClick={() => ui.open("import")}>
-                <Icon name="upload" /><div className="t">Importar extrato<small>Arquivo OFX ou CSV do seu banco</small></div><Icon name="right" size={18} />
-              </button>
-              <button className="setting-row" onClick={exportBackup}>
-                <Icon name="download" /><div className="t">Baixar backup<small>Salva tudo num arquivo .json</small></div>
-              </button>
-              <button className="setting-row" onClick={() => fileRef.current?.click()}>
-                <Icon name="repeat" /><div className="t">Restaurar backup</div>
-              </button>
-              <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => importBackup(e.target.files[0])} />
+            {pinOn && (
+              <>
+                <div className="set">
+                  <div className="body"><div className="t">Bloquear automaticamente</div><div className="d">Depois de sair do app</div></div>
+                  <div style={{ width: 300 }}>
+                    <Seg value={s.lockAfter ?? 1} onChange={(lockAfter) => setSettings({ lockAfter })} label="Tempo para bloquear" options={LOCK_OPTIONS} />
+                  </div>
+                </div>
+                <button className="set" onClick={() => ui.open("pin", { mode: "change" })}><div className="body"><div className="t">Alterar PIN</div></div></button>
+                <button className="set" onClick={lock}><div className="body"><div className="t">Bloquear agora</div></div></button>
+              </>
+            )}
+            <div className="set">
+              <div className="body"><div className="t">Ocultar valores</div><div className="d">Esconde os números na tela</div></div>
+              <Switch checked={s.hideValues} onChange={(hideValues) => setSettings({ hideValues })} label="Ocultar valores" />
             </div>
+            <a className="set" href="#/privacidade" onClick={(e) => { e.preventDefault(); go("privacidade"); }} style={{ textDecoration: "none" }}>
+              <div className="body"><div className="t">Política de Privacidade</div><div className="d">Aceita em {s.consentAt ? new Date(s.consentAt).toLocaleDateString("pt-BR") : "data não registrada"}</div></div>
+              <Icon name="right" size={16} />
+            </a>
           </div>
+        </section>
 
-          <div className="note row" style={{ alignItems: "flex-start", gap: 10 }}>
-            <Icon name="bank" size={18} />
-            <span>
-              <b>Conexão automática com bancos (Open Finance)</b> precisa de um servidor e de um agregador autorizado pelo Banco Central.
-              Por enquanto o baum funciona 100% no seu aparelho: importe o extrato OFX/CSV do seu banco. A estrutura já está pronta pra plugar isso depois.
-            </span>
+        <section>
+          <SectionHead title="Contas"><button onClick={() => ui.open("account")}>Adicionar</button></SectionHead>
+          <div className="list">
+            {state.accounts.map((a) => (
+              <button key={a.id} className="item" onClick={() => ui.open("account", { item: a })}>
+                <Dot color={a.color} />
+                <div className="body"><div className="t">{a.name}</div><div className="m">{a.bank}{a.hidden ? ", fora do saldo total" : ""}</div></div>
+                <div className="v"><Money value={accountBalance(a, state.transactions)} /></div>
+              </button>
+            ))}
+            {!state.accounts.length && <div className="empty">Nenhuma conta cadastrada.</div>}
           </div>
+        </section>
 
-          <button className="btn danger block" onClick={() => {
-            if (confirm("Apagar todos os dados do baum neste aparelho? Baixe um backup antes se quiser guardar.")) { close(); reset(); }
-          }}><Icon name="trash" size={18} />Apagar tudo</button>
-
-          <div style={{ textAlign: "center", padding: "8px 0 4px", color: "var(--muted)", fontSize: "0.82rem" }}>
-            <Logo size={22} />
-            <div style={{ marginTop: 6 }}>Seus dados ficam só neste aparelho.</div>
+        <section>
+          <SectionHead title="Dados" />
+          <div style={{ borderTop: "1px solid var(--line)" }}>
+            <button className="set" onClick={() => ui.open("category")}><div className="body"><div className="t">Categorias e limites</div><div className="d">Defina um limite mensal por categoria</div></div></button>
+            <button className="set" onClick={() => ui.open("import")}><div className="body"><div className="t">Importar extrato</div><div className="d">Arquivo OFX ou CSV do seu banco</div></div></button>
+            <button className="set" onClick={exportData}><div className="body"><div className="t">Exportar dados</div><div className="d">Arquivo JSON com todas as informações. Não é criptografado.</div></div></button>
+            <button className="set" onClick={() => fileRef.current?.click()}><div className="body"><div className="t">Restaurar dados</div><div className="d">A partir de um arquivo exportado</div></div></button>
+            <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => { restore(e.target.files[0]); e.target.value = ""; }} />
+            <button className="set" onClick={() => {
+              if (confirm("Excluir todos os dados deste aparelho? Esta ação não pode ser desfeita.")) { eraseAll(); location.hash = ""; }
+            }}><div className="body"><div className="t danger-text">Excluir todos os dados</div><div className="d">Remove tudo deste aparelho, imediatamente</div></div></button>
           </div>
-        </>
-      )}
-    </Sheet>
+        </section>
+
+        <p className="muted" style={{ fontSize: "0.8rem" }}>{APP.name} {APP.version}. Seus dados ficam apenas neste aparelho.</p>
+      </div>
+    </div>
   );
 }

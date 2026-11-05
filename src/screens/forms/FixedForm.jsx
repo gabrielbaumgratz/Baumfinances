@@ -3,7 +3,6 @@ import { useStore } from "../../lib/store.jsx";
 import { useUI } from "../../lib/ui-state.jsx";
 import { fromISO, today, MONTHS } from "../../lib/dates.js";
 import Sheet from "../../components/Sheet.jsx";
-import Icon from "../../components/Icon.jsx";
 import Money from "../../components/Money.jsx";
 import { Field, Seg, Switch } from "../../components/ui.jsx";
 import { AccountPicker, AmountInput, CategoryPicker, toInput, validAmount } from "./shared.jsx";
@@ -36,7 +35,7 @@ export default function FixedForm({ item, due, onClose }) {
   const togglePaid = () => {
     if (paidTx) {
       remove("transactions", paidTx.id);
-      ui.toast("Desmarcado");
+      ui.toast("Pagamento desmarcado");
     } else {
       upsert("transactions", {
         date: due <= today() ? due : today(), amount: item.kind === "income" ? item.amount : -item.amount,
@@ -50,33 +49,32 @@ export default function FixedForm({ item, due, onClose }) {
     <Sheet title={editing ? item.name : "Novo fixo"} onClose={onClose}
       footer={(close) => (
         <>
-          {editing && <button className="btn danger" style={{ flex: "0 0 auto" }} aria-label="Apagar" onClick={() => { remove("fixed", item.id); ui.toast("Fixo apagado", () => upsert("fixed", item)); close(); }}><Icon name="trash" /></button>}
+          {editing && <button className="btn danger" onClick={() => { remove("fixed", item.id); ui.toast("Fixo excluído", () => upsert("fixed", item)); close(); }}>Excluir</button>}
           <button className="btn" onClick={() => save(close)}>Salvar</button>
         </>
       )}>
       {editing && due && item.active !== false && (
-        <div className="card" style={{ padding: 16, display: "flex", alignItems: "center", gap: 12 }}>
-          <div className={`ico-tile ${paidTx ? "brand" : ""}`}><Icon name={paidTx ? "check" : "clock"} /></div>
+        <div className="row" style={{ padding: "14px 0", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 600 }}>{paidTx ? (item.kind === "income" ? "Recebido" : "Pago") : "Pendente"} em {dueMonth}</div>
             <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}><Money value={item.amount} /> · vence dia {item.day}</div>
           </div>
-          <button className={`btn sm ${paidTx ? "ghost" : "brand"}`} onClick={togglePaid}>{paidTx ? "Desfazer" : item.kind === "income" ? "Recebi" : "Paguei"}</button>
+          <button className={`btn sm ${paidTx ? "ghost" : ""}`} onClick={togglePaid}>{paidTx ? "Desmarcar" : item.kind === "income" ? "Marcar recebido" : "Marcar pago"}</button>
         </div>
       )}
-      <Seg value={kind} onChange={setKind} label="Tipo" options={[{ value: "expense", label: "Gasto fixo" }, { value: "income", label: "Renda fixa" }]} />
-      <AmountInput value={amount} onChange={setAmount} error={touched && !value ? "Coloca um valor" : ""} />
-      <Field id="fname" label="Nome" error={touched && !name.trim() ? "Dá um nome" : ""}>
-        <input id="fname" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={kind === "income" ? "Ex: Salário, Estágio" : "Ex: Aluguel, Netflix"} />
+      <Seg value={kind} onChange={setKind} label="Tipo" options={[{ value: "expense", label: "Despesa" }, { value: "income", label: "Receita" }]} />
+      <AmountInput value={amount} onChange={setAmount} error={touched && !value ? "Informe um valor" : ""} />
+      <Field id="fname" label="Nome" error={touched && !name.trim() ? "Informe um nome" : ""}>
+        <input id="fname" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={kind === "income" ? "Salário" : "Aluguel"} />
       </Field>
-      <Field id="day" label={kind === "income" ? "Dia que cai" : "Dia do vencimento"} help="Se o mês não tiver esse dia, usamos o último.">
+      <Field id="day" label={kind === "income" ? "Dia que cai" : "Dia do vencimento"} help="Em meses mais curtos, vale o último dia.">
         <input id="day" className="input" type="number" inputMode="numeric" min={1} max={31} value={day} onChange={(e) => setDay(e.target.value)} />
       </Field>
       <CategoryPicker categories={state.categories} value={categoryId} onChange={setCategoryId} />
       <AccountPicker accounts={state.accounts} value={accountId} onChange={setAccountId} allowNone />
       {editing && (
-        <div className="setting-row">
-          <div className="t">Ativo<small>Pause sem apagar o histórico</small></div>
+        <div className="set" style={{ borderTop: "1px solid var(--line)" }}>
+          <div className="body"><div className="t">Ativo</div><div className="d">Pause sem perder o histórico</div></div>
           <Switch checked={active} onChange={setActive} label="Ativo" />
         </div>
       )}

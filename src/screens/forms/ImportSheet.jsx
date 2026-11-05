@@ -54,7 +54,7 @@ export default function ImportSheet({ onClose }) {
 
   const doImport = (close) => {
     addMany("transactions", chosen.map(({ i, dup, ...r }) => ({ ...r, accountId, note: "" })));
-    ui.toast(`${chosen.length} lançamentos importados`);
+    ui.toast(`${chosen.length} ${chosen.length === 1 ? "lançamento importado" : "lançamentos importados"}`);
     close();
   };
 
@@ -63,45 +63,41 @@ export default function ImportSheet({ onClose }) {
       footer={file && parsed.rows.length ? (close) => <button className="btn" disabled={!chosen.length || !accountId} onClick={() => doImport(close)}>Importar {chosen.length}</button> : null}>
       {!file ? (
         <>
-          <p style={{ color: "var(--ink-2)" }}>
-            Baixe o extrato no app ou site do seu banco em <b>OFX</b> (o mais comum) ou <b>CSV</b> e solte aqui. A gente categoriza sozinho e ignora o que já foi importado.
+          <p className="muted">
+            Baixe o extrato no aplicativo ou site do seu banco, em formato OFX ou CSV, e selecione o arquivo.
+            Os lançamentos são categorizados automaticamente e duplicados são ignorados.
           </p>
           <div className={`drop${over ? " over" : ""}`} role="button" tabIndex={0}
             onClick={() => input.current?.click()} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && input.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)}
             onDrop={(e) => { e.preventDefault(); setOver(false); load(e.dataTransfer.files[0]); }}>
-            <div className="ico-tile"><Icon name="file" /></div>
-            <b>Escolher arquivo</b>
-            <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>.ofx ou .csv</span>
+            <b>Selecionar arquivo</b>
+            <span style={{ fontSize: "0.85rem" }}>OFX ou CSV</span>
           </div>
           <input ref={input} type="file" accept=".ofx,.csv,.txt,text/csv" hidden onChange={(e) => load(e.target.files[0])} />
-          <div className="note row" style={{ alignItems: "flex-start" }}>
-            <Icon name="info" size={18} />
-            <span>Tudo é lido no seu aparelho. Nenhum dado sai daqui.</span>
-          </div>
+          <p className="notice">O arquivo é lido apenas neste aparelho e não é enviado para nenhum servidor.</p>
         </>
       ) : (
         <>
           <div className="row">
-            <div className="ico-tile"><Icon name="file" /></div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
-              <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}>{parsed.rows.length} encontrados · {parsed.rows.filter((r) => r.dup).length} já existiam</div>
+              <div style={{ fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+              <div className="muted" style={{ fontSize: "0.85rem" }}>{parsed.rows.length} encontrados, {parsed.rows.filter((r) => r.dup).length} já importados</div>
             </div>
-            <button className="btn sm ghost" onClick={() => setFile(null)}>Trocar</button>
+            <button className="btn sm ghost" onClick={() => setFile(null)}>Trocar arquivo</button>
           </div>
           {state.accounts.length ? (
             <AccountPicker accounts={state.accounts} value={accountId} onChange={setAccountId} />
           ) : (
-            <div className="note">Crie uma conta antes de importar (Ajustes → Contas).</div>
+            <p className="notice">Cadastre uma conta antes de importar, em Ajustes.</p>
           )}
           {isCSV && (
-            <div className="setting-row">
-              <div className="t">É fatura de cartão<small>Compras aparecem positivas no arquivo</small></div>
-              <Switch checked={invert} onChange={setInvert} label="É fatura de cartão" />
+            <div className="set" style={{ borderTop: "1px solid var(--line)" }}>
+              <div className="body"><div className="t">Fatura de cartão</div><div className="d">Compras aparecem como valores positivos no arquivo</div></div>
+              <Switch checked={invert} onChange={setInvert} label="Fatura de cartão" />
             </div>
           )}
-          {parsed.error && <div className="note" style={{ color: "var(--danger)" }}>{parsed.error}</div>}
+          {parsed.error && <div className="err" role="alert">{parsed.error}</div>}
           <div className="list">
             {parsed.rows.map((r) => {
               const on = !r.dup && !skip.has(r.i);
@@ -109,12 +105,12 @@ export default function ImportSheet({ onClose }) {
               return (
                 <button key={r.i} className="item" disabled={r.dup} style={{ opacity: r.dup ? 0.45 : 1 }} aria-pressed={on}
                   onClick={() => setSkip((s) => { const n = new Set(s); n.has(r.i) ? n.delete(r.i) : n.add(r.i); return n; })}>
-                  <span className={`check${on ? " on" : ""}`}>{on && <Icon name="check" size={16} stroke={2.4} />}</span>
-                  <div className="main-col">
-                    <div className="title">{r.merchant}</div>
-                    <div className="meta"><span>{shortDate(r.date)}</span><span>· {c?.name}</span>{r.dup && <span className="badge">já importado</span>}</div>
+                  <span className={`check${on ? " on" : ""}`}>{on && <Icon name="check" size={14} stroke={2.4} />}</span>
+                  <div className="body">
+                    <div className="t">{r.merchant}</div>
+                    <div className="m row" style={{ gap: 10 }}><span>{shortDate(r.date)}</span><span>{c?.name}</span>{r.dup && <span>Já importado</span>}</div>
                   </div>
-                  <div className={`amt ${r.amount > 0 ? "pos" : ""}`}><Money value={r.amount} signed /></div>
+                  <div className={`v ${r.amount > 0 ? "pos" : ""}`}><Money value={r.amount} signed /></div>
                 </button>
               );
             })}

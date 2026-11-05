@@ -4,7 +4,6 @@ import { useUI } from "../../lib/ui-state.jsx";
 import { guessCategory } from "../../lib/categories.js";
 import { today } from "../../lib/dates.js";
 import Sheet from "../../components/Sheet.jsx";
-import Icon from "../../components/Icon.jsx";
 import { Field, Seg } from "../../components/ui.jsx";
 import { AccountPicker, AmountInput, CategoryPicker, toInput, validAmount } from "./shared.jsx";
 
@@ -46,7 +45,7 @@ export default function TxForm({ item, onClose }) {
 
   const del = (close) => {
     remove("transactions", item.id);
-    ui.toast("Lançamento apagado", () => upsert("transactions", item));
+    ui.toast("Lançamento excluído", () => upsert("transactions", item));
     close();
   };
 
@@ -54,14 +53,14 @@ export default function TxForm({ item, onClose }) {
     <Sheet title={editing ? "Editar lançamento" : "Novo lançamento"} onClose={onClose}
       footer={(close) => (
         <>
-          {editing && <button className="btn danger" style={{ flex: "0 0 auto" }} onClick={() => del(close)} aria-label="Apagar"><Icon name="trash" /></button>}
+          {editing && <button className="btn danger" onClick={() => del(close)}>Excluir</button>}
           <button className="btn" onClick={() => save(close)}>Salvar</button>
         </>
       )}>
-      <Seg value={kind} onChange={setKind} label="Tipo" tone={kind === "in" ? "brand" : ""} options={[{ value: "out", label: "Saída" }, { value: "in", label: "Entrada" }]} />
-      <AmountInput value={amount} onChange={setAmount} error={touched && !value ? "Coloca um valor maior que zero" : ""} />
-      <Field id="merchant" label={kind === "in" ? "De onde veio?" : "Onde foi?"} error={touched && !merchant.trim() ? "Diz onde foi, nem que seja “Outros”" : ""}>
-        <input id="merchant" className="input" list="merchants" value={merchant} onChange={(e) => setMerchant(e.target.value)} placeholder={kind === "in" ? "Ex: Salário, Pix da mãe" : "Ex: Mercado, iFood, Uber"} autoComplete="off" />
+      <Seg value={kind} onChange={setKind} label="Tipo" options={[{ value: "out", label: "Saída" }, { value: "in", label: "Entrada" }]} />
+      <AmountInput value={amount} onChange={setAmount} error={touched && !value ? "Informe um valor maior que zero" : ""} />
+      <Field id="merchant" label={kind === "in" ? "Origem" : "Estabelecimento"} error={touched && !merchant.trim() ? "Informe o estabelecimento ou a origem" : ""}>
+        <input id="merchant" className="input" list="merchants" value={merchant} onChange={(e) => setMerchant(e.target.value)} placeholder={kind === "in" ? "Salário, transferência" : "Mercado, farmácia, aplicativo"} autoComplete="off" />
         <datalist id="merchants">{merchants.map((m) => <option key={m} value={m} />)}</datalist>
       </Field>
       <CategoryPicker categories={state.categories} value={cat} onChange={(v) => { setCategoryId(v); setCatTouched(true); }} />
@@ -69,8 +68,8 @@ export default function TxForm({ item, onClose }) {
       <Field id="date" label="Data">
         <input id="date" className="input" type="date" value={date} onChange={(e) => setDate(e.target.value || today())} />
       </Field>
-      <Field id="note" label="Por quê? (opcional)" help="Uma nota pra você lembrar depois: motivo, com quem, se valeu a pena.">
-        <textarea id="note" className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex: aniversário do Pedro" />
+      <Field id="note" label="Motivo" help="Opcional. Ajuda a lembrar por que o gasto aconteceu.">
+        <textarea id="note" className="input" value={note} onChange={(e) => setNote(e.target.value)} />
       </Field>
     </Sheet>
   );

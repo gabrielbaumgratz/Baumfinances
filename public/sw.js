@@ -1,5 +1,5 @@
 // Offline cache: network-first for navigations, cache-first for static assets.
-const CACHE = "baum-v2";
+const CACHE = "prumo-v2.1";
 self.addEventListener("install", (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "./index.html"]))); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
@@ -12,7 +12,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   e.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((r) => {
-    if (r.ok && (new URL(req.url).origin === location.origin || req.url.includes("fonts.g"))) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
+    if (r.ok && (new URL(req.url).origin === location.origin)) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
     return r;
   })));
 });

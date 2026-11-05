@@ -3,7 +3,7 @@ const brlShort = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "
 
 export const fmt = (v) => brl.format(v || 0);
 export const fmtShort = (v) => (Math.abs(v) >= 10000 ? brlShort.format(v) : brl.format(v || 0));
-export const fmtSigned = (v) => (v > 0 ? "+ " : v < 0 ? "− " : "") + brl.format(Math.abs(v || 0));
+export const fmtSigned = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + brl.format(Math.abs(v || 0));
 
 /** Parses "1.234,56", "1234.56", "R$ 12,3", "-50" into a number (NaN if invalid). */
 export function parseMoney(input) {

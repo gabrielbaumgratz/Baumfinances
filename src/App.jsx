@@ -4,11 +4,13 @@ import { UICtx } from "./lib/ui-state.jsx";
 import Icon from "./components/Icon.jsx";
 import Logo from "./components/Logo.jsx";
 import Onboarding from "./screens/Onboarding.jsx";
+import Lock from "./screens/Lock.jsx";
 import Home from "./screens/Home.jsx";
 import Statement from "./screens/Statement.jsx";
 import Plans from "./screens/Plans.jsx";
 import Insights from "./screens/Insights.jsx";
 import Settings from "./screens/Settings.jsx";
+import Privacy from "./screens/Privacy.jsx";
 import TxForm from "./screens/forms/TxForm.jsx";
 import FixedForm from "./screens/forms/FixedForm.jsx";
 import PlanForm from "./screens/forms/PlanForm.jsx";
@@ -16,20 +18,22 @@ import WishForm from "./screens/forms/WishForm.jsx";
 import AccountForm from "./screens/forms/AccountForm.jsx";
 import CategoryForm from "./screens/forms/CategoryForm.jsx";
 import ImportSheet from "./screens/forms/ImportSheet.jsx";
+import PinForm from "./screens/forms/PinForm.jsx";
 
-const TABS = [
+const NAV = [
   { id: "inicio", label: "Início", icon: "home" },
   { id: "extrato", label: "Extrato", icon: "list" },
-  { id: "planos", label: "Planos", icon: "calendar" },
+  { id: "planejamento", label: "Planejamento", icon: "calendar" },
   { id: "analise", label: "Análise", icon: "chart" },
+  { id: "ajustes", label: "Ajustes", icon: "settings" },
 ];
-
-const SHEETS = { tx: TxForm, fixed: FixedForm, plan: PlanForm, wish: WishForm, account: AccountForm, category: CategoryForm, import: ImportSheet, settings: Settings };
+const SCREENS = { inicio: Home, extrato: Statement, planejamento: Plans, analise: Insights, ajustes: Settings, privacidade: Privacy };
+const SHEETS = { tx: TxForm, fixed: FixedForm, plan: PlanForm, wish: WishForm, account: AccountForm, category: CategoryForm, import: ImportSheet, pin: PinForm };
 
 function useHashRoute() {
   const read = () => {
     const [tab, sub] = location.hash.replace(/^#\/?/, "").split("/");
-    return { tab: TABS.some((t) => t.id === tab) ? tab : "inicio", sub };
+    return { tab: SCREENS[tab] ? tab : "inicio", sub };
   };
   const [route, setRoute] = useState(read);
   useEffect(() => {
@@ -44,64 +48,60 @@ function useHashRoute() {
   return [route, go];
 }
 
-function useTheme(settings) {
-  useEffect(() => {
-    const root = document.documentElement;
-    const theme = settings?.theme || "system";
-    if (theme === "system") root.removeAttribute("data-theme");
-    else root.setAttribute("data-theme", theme);
-    if (settings?.bigText) root.setAttribute("data-text", "big");
-    else root.removeAttribute("data-text");
-    const meta = document.querySelector('meta[name="theme-color"]');
-    const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
-    meta?.setAttribute("content", dark ? "#0b0c0a" : "#f4f4f0");
-  }, [settings?.theme, settings?.bigText]);
+function applyPrefs(p = {}) {
+  const root = document.documentElement;
+  const theme = p.theme || "system";
+  if (theme === "system") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", theme);
+  if (p.bigText) root.setAttribute("data-text", "big"); else root.removeAttribute("data-text");
+  const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0c0c0b" : "#fafaf8");
 }
 
 export default function App() {
-  const { state } = useStore();
+  const { state, status } = useStore();
   const [route, go] = useHashRoute();
   const [sheet, setSheet] = useState(null);
   const [toast, setToast] = useState(null);
-  const toastTimer = useRef();
-  useTheme(state?.settings);
+  const timer = useRef();
 
-  const ui = useMemo(
-    () => ({
-      open: (type, payload = {}) => setSheet({ type, payload, key: Date.now() }),
-      close: () => setSheet(null),
-      toast: (msg, undo) => {
-        clearTimeout(toastTimer.current);
-        setToast({ msg, undo, key: Date.now() });
-        toastTimer.current = setTimeout(() => setToast(null), undo ? 5000 : 2600);
-      },
-      go,
-    }),
-    [go],
-  );
+  useEffect(() => { if (state) applyPrefs(state.settings); }, [state?.settings.theme, state?.settings.bigText]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (status !== "ready") setSheet(null); }, [status]);
 
-  if (!state) return <Onboarding />;
+  const ui = useMemo(() => ({
+    open: (type, payload = {}) => setSheet({ type, payload, key: Date.now() }),
+    toast: (msg, undo) => {
+      clearTimeout(timer.current);
+      setToast({ msg, undo, key: Date.now() });
+      timer.current = setTimeout(() => setToast(null), undo ? 5000 : 2400);
+    },
+    go,
+  }), [go]);
 
-  const Screen = { inicio: Home, extrato: Statement, planos: Plans, analise: Insights }[route.tab];
+  if (status === "locked") return <Lock />;
+  if (status !== "ready") return <UICtx.Provider value={ui}>{route.tab === "privacidade" ? <main className="main"><Privacy go={go} public /></main> : <Onboarding go={go} />}</UICtx.Provider>;
+
+  const Screen = SCREENS[route.tab];
   const SheetCmp = sheet && SHEETS[sheet.type];
 
   return (
     <UICtx.Provider value={ui}>
       <div className="app">
         <nav className="nav" aria-label="Navegação principal">
-          <div className="nav-brand"><Logo size={30} /></div>
-          {TABS.slice(0, 2).map((t) => <NavItem key={t.id} t={t} active={route.tab === t.id} go={go} />)}
-          <div className="nav-add-wrap">
-            <button className="nav-add" onClick={() => ui.open("tx")} aria-label="Novo lançamento">
-              <Icon name="plus" size={24} stroke={2.2} />
-              <span className="nav-add-label">Novo lançamento</span>
-            </button>
-          </div>
-          {TABS.slice(2).map((t) => <NavItem key={t.id} t={t} active={route.tab === t.id} go={go} />)}
+          <div className="nav-brand"><Logo /></div>
+          <button className="btn block nav-new" onClick={() => ui.open("tx")}><Icon name="plus" size={18} />Novo lançamento</button>
+          {NAV.map((t) => (
+            <a key={t.id} className={`nav-item${t.id === "ajustes" ? " end" : ""}`} href={`#/${t.id}`}
+              aria-current={route.tab === t.id || (t.id === "ajustes" && route.tab === "privacidade") ? "page" : undefined}
+              onClick={(e) => { e.preventDefault(); go(t.id); }}>
+              <Icon name={t.icon} size={20} stroke={1.6} />
+              <span>{t.label}</span>
+            </a>
+          ))}
         </nav>
         <main className="main">
           <Screen key={route.tab} sub={route.sub} go={go} />
         </main>
+        <button className="fab" onClick={() => ui.open("tx")} aria-label="Novo lançamento"><Icon name="plus" size={22} stroke={1.8} /></button>
       </div>
       {SheetCmp && <SheetCmp key={sheet.key} {...sheet.payload} onClose={() => setSheet(null)} />}
       {toast && (
@@ -111,14 +111,5 @@ export default function App() {
         </div>
       )}
     </UICtx.Provider>
-  );
-}
-
-function NavItem({ t, active, go }) {
-  return (
-    <a className="nav-item" href={`#/${t.id}`} aria-current={active ? "page" : undefined} onClick={(e) => { e.preventDefault(); go(t.id); }}>
-      <span className="nav-ico"><Icon name={t.icon} size={22} stroke={active ? 2.1 : 1.8} /></span>
-      <span>{t.label}</span>
-    </a>
   );
 }

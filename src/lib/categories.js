@@ -1,7 +1,7 @@
 // Default categories. `keywords` power auto-categorization of imported statements.
 export const DEFAULT_CATEGORIES = [
   { id: "mercado", name: "Mercado", icon: "cart", keywords: ["supermerc", "mercado", "atacad", "hortifruti", "padaria", "carrefour", "assai", "assaí", "epa", "verdemar", "bh supermercados", "pao de acucar"] },
-  { id: "comida", name: "Comida fora", icon: "utensils", keywords: ["ifood", "restaurante", "lanchonete", "pizza", "burger", "bar ", "cafe", "café", "rappi", "mc donalds", "mcdonald", "outback", "subway", "acai", "açaí"] },
+  { id: "comida", name: "Restaurantes", icon: "utensils", keywords: ["ifood", "restaurante", "lanchonete", "pizza", "burger", "bar ", "cafe", "café", "rappi", "mc donalds", "mcdonald", "outback", "subway", "acai", "açaí"] },
   { id: "transporte", name: "Transporte", icon: "car", keywords: ["uber", "99app", "99 ", "posto", "combust", "gasolina", "estacion", "pedagio", "pedágio", "metro", "onibus", "ônibus", "bhbus", "ipiranga", "shell"] },
   { id: "moradia", name: "Moradia", icon: "home", keywords: ["aluguel", "condominio", "condomínio", "iptu"] },
   { id: "contas", name: "Contas", icon: "zap", keywords: ["cemig", "copasa", "energia", "agua", "água", "internet", "vivo", "claro", "tim ", "oi "] },
@@ -11,7 +11,7 @@ export const DEFAULT_CATEGORIES = [
   { id: "compras", name: "Compras", icon: "bag", keywords: ["shopee", "mercadolivre", "mercado livre", "amazon", "aliexpress", "shein", "magalu", "renner", "c&a", "riachuelo", "zara", "kabum"] },
   { id: "educacao", name: "Educação", icon: "book", keywords: ["puc", "faculdade", "curso", "udemy", "alura", "livraria", "escola"] },
   { id: "viagem", name: "Viagem", icon: "plane", keywords: ["latam", "gol ", "azul ", "airbnb", "booking", "hotel", "decolar", "123milhas"] },
-  { id: "pessoal", name: "Cuidados", icon: "sparkle", keywords: ["barbearia", "salao", "salão", "cabelo", "estetica"] },
+  { id: "pessoal", name: "Cuidados pessoais", icon: "sparkle", keywords: ["barbearia", "salao", "salão", "cabelo", "estetica"] },
   { id: "presentes", name: "Presentes", icon: "gift", keywords: [] },
   { id: "renda", name: "Renda", icon: "briefcase", keywords: ["salario", "salário", "bolsa", "estagio", "estágio", "pagamento recebido", "rendimento"] },
   { id: "transferencias", name: "Transferências", icon: "swap", keywords: ["pix", "transferencia", "transferência", "ted ", "doc "] },
