@@ -5,6 +5,7 @@ import Icon from "./components/Icon.jsx";
 import Logo from "./components/Logo.jsx";
 import Onboarding from "./screens/Onboarding.jsx";
 import Lock from "./screens/Lock.jsx";
+import CreatePin from "./screens/CreatePin.jsx";
 import Home from "./screens/Home.jsx";
 import Statement from "./screens/Statement.jsx";
 import Plans from "./screens/Plans.jsx";
@@ -79,7 +80,8 @@ export default function App() {
   }), [go]);
 
   if (status === "locked") return <Lock />;
-  if (status !== "ready") return <UICtx.Provider value={ui}>{route.tab === "privacidade" ? <main className="main"><Privacy go={go} public /></main> : <Onboarding go={go} />}</UICtx.Provider>;
+  if (status === "needsPin") return <CreatePin />;
+  if (status !== "ready") return <UICtx.Provider value={ui}>{route.tab === "privacidade" ? <main className="main" style={{ marginLeft: 0 }}><Privacy go={go} public /></main> : <Onboarding go={go} />}</UICtx.Provider>;
 
   const Screen = SCREENS[route.tab];
   const SheetCmp = sheet && SHEETS[sheet.type];

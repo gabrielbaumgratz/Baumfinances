@@ -1,7 +1,7 @@
 import { useStore } from "../lib/store.jsx";
 import { useUI } from "../lib/ui-state.jsx";
 import { accountBalance } from "../lib/selectors.js";
-import { cryptoAvailable } from "../lib/vault.js";
+import { useAuth } from "./auth/AuthGate.jsx";
 import { APP } from "../config.js";
 import Icon from "../components/Icon.jsx";
 import Money from "../components/Money.jsx";
@@ -12,10 +12,20 @@ const LOCK_OPTIONS = [
 ];
 
 export default function Settings({ go }) {
-  const { state, setSettings, eraseAll, hasPin, lock } = useStore();
+  const { state, setSettings, eraseAll, lock } = useStore();
   const ui = useUI();
+  const auth = useAuth();
   const s = state.settings;
-  const pinOn = hasPin();
+
+  const deleteAccount = async () => {
+    if (!confirm("Excluir sua conta e todos os dados deste aparelho? Esta ação não pode ser desfeita.")) return;
+    try {
+      await auth.deleteAccount();
+      eraseAll();
+    } catch {
+      ui.toast("Não foi possível excluir a conta agora. Verifique a conexão.");
+    }
+  };
 
   return (
     <div className="page narrow">
@@ -27,6 +37,18 @@ export default function Settings({ go }) {
             <input id="uname" className="input" value={s.name} maxLength={60} autoComplete="given-name" onChange={(e) => setSettings({ name: e.target.value })} placeholder="Como você quer ser chamado" />
           </Field>
         </section>
+
+        {auth && (
+          <section>
+            <SectionHead title="Conta" />
+            <div style={{ borderTop: "1px solid var(--line)" }}>
+              <div className="set"><div className="body"><div className="t">E-mail</div><div className="d">{auth.user.email}</div></div></div>
+              <div className="set"><div className="body"><div className="t">Verificação em 2 etapas</div><div className="d">App autenticador</div></div><span className="d pos">Ativa</span></div>
+              <button className="set" onClick={auth.signOut}><div className="body"><div className="t">Sair da conta</div><div className="d">Seus dados continuam criptografados neste aparelho</div></div></button>
+              <button className="set" onClick={deleteAccount}><div className="body"><div className="t danger-text">Excluir conta</div><div className="d">Apaga a conta no servidor e os dados deste aparelho</div></div></button>
+            </div>
+          </section>
+        )}
 
         <section>
           <SectionHead title="Aparência" />
@@ -48,24 +70,17 @@ export default function Settings({ go }) {
           <SectionHead title="Privacidade e segurança" />
           <div style={{ borderTop: "1px solid var(--line)" }}>
             <div className="set">
-              <div className="body">
-                <div className="t">Bloqueio com PIN</div>
-                <div className="d">{cryptoAvailable() ? "Pede um PIN ao abrir e criptografa os dados no aparelho" : "Indisponível neste navegador"}</div>
-              </div>
-              <Switch checked={pinOn} label="Bloqueio com PIN" onChange={() => cryptoAvailable() && ui.open("pin", { mode: pinOn ? "off" : "on" })} />
+              <div className="body"><div className="t">Bloqueio com PIN</div><div className="d">Sempre ativo. Seus dados ficam criptografados neste aparelho.</div></div>
+              <span className="d pos">Ativo</span>
             </div>
-            {pinOn && (
-              <>
-                <div className="set">
-                  <div className="body"><div className="t">Bloquear automaticamente</div><div className="d">Depois de sair do app</div></div>
-                  <div style={{ width: 300 }}>
-                    <Seg value={s.lockAfter ?? 1} onChange={(lockAfter) => setSettings({ lockAfter })} label="Tempo para bloquear" options={LOCK_OPTIONS} />
-                  </div>
-                </div>
-                <button className="set" onClick={() => ui.open("pin", { mode: "change" })}><div className="body"><div className="t">Alterar PIN</div></div></button>
-                <button className="set" onClick={lock}><div className="body"><div className="t">Bloquear agora</div></div></button>
-              </>
-            )}
+            <div className="set">
+              <div className="body"><div className="t">Bloquear automaticamente</div><div className="d">Depois de sair do app</div></div>
+              <div style={{ width: 300 }}>
+                <Seg value={s.lockAfter ?? 1} onChange={(lockAfter) => setSettings({ lockAfter })} label="Tempo para bloquear" options={LOCK_OPTIONS} />
+              </div>
+            </div>
+            <button className="set" onClick={() => ui.open("pin")}><div className="body"><div className="t">Alterar PIN</div></div></button>
+            <button className="set" onClick={lock}><div className="body"><div className="t">Bloquear agora</div></div></button>
             <div className="set">
               <div className="body"><div className="t">Ocultar valores</div><div className="d">Esconde os números na tela</div></div>
               <Switch checked={s.hideValues} onChange={(hideValues) => setSettings({ hideValues })} label="Ocultar valores" />
@@ -104,7 +119,7 @@ export default function Settings({ go }) {
           </div>
         </section>
 
-        <p className="muted" style={{ fontSize: "0.8rem" }}>{APP.name} {APP.version}. Seus dados ficam apenas neste aparelho.</p>
+        <p className="muted" style={{ fontSize: "0.8rem" }}>{APP.name} {APP.versionLabel}. Seus dados financeiros ficam apenas neste aparelho.</p>
       </div>
     </div>
   );

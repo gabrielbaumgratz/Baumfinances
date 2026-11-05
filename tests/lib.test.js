@@ -152,3 +152,11 @@ describe("backup", () => {
   });
   it("rejects unknown files", () => expect(() => inspectBackup('{"x":1}')).toThrow());
 });
+
+import { pinProblem } from "../src/lib/pin.js";
+
+describe("pin", () => {
+  it.each([["123456", false], ["111111", false], ["987654", false], ["4829", false], ["25121998", false], ["482913", true], ["70315528", true]])("%s ok=%s", (pin, ok) => {
+    expect(pinProblem(pin) === "").toBe(ok);
+  });
+});

@@ -1,18 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import { StoreProvider } from "./lib/store.jsx";
+import Root from "./Root.jsx";
+import { registerServiceWorker } from "./lib/pwa.js";
 import "./styles.css";
+
+// Impede que o app seja carregado dentro de outro site (clickjacking).
+if (window.top !== window.self) {
+  document.body.innerHTML = "";
+  throw new Error("Prumo não pode ser exibido dentro de outra página.");
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <StoreProvider>
-      <App />
-    </StoreProvider>
+    <Root />
   </React.StrictMode>,
 );
 
-// No app nativo os arquivos já estão no aparelho; o service worker só serve à versão web.
-if ("serviceWorker" in navigator && import.meta.env.PROD && !window.Capacitor?.isNativePlatform?.()) {
-  window.addEventListener("load", () => navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {}));
-}
+registerServiceWorker();

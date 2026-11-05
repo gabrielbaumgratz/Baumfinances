@@ -19,7 +19,7 @@ export default function Onboarding({ go }) {
         <li><b>Todas as contas juntas</b>Contas, cartões e reservas com saldo calculado automaticamente.</li>
         <li><b>Gastos explicados</b>Onde, quanto, quantas vezes e por quê.</li>
         <li><b>Planejamento</b>Gastos fixos, compras futuras e lista de desejos.</li>
-        <li><b>Privado por padrão</b>Seus dados ficam apenas neste aparelho. Sem cadastro, sem rastreamento.</li>
+        <li><b>Privado por padrão</b>Seus dados financeiros ficam apenas neste aparelho, criptografados. Sem rastreamento.</li>
       </ul>
       <div className="spacer" style={{ minHeight: 32 }} />
       <label className="consent" style={{ marginBottom: 16 }}>

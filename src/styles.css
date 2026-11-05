@@ -349,3 +349,9 @@ button.set:hover .t { text-decoration: underline; text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* cortina de privacidade e selo beta */
+.curtain { position: fixed; inset: 0; z-index: 100; background: var(--panel); display: grid; place-items: center; }
+.beta { display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; color: var(--brand-ink); background: var(--brand-soft); vertical-align: middle; }
+.qr { width: 200px; height: 200px; background: #fff; padding: 10px; border-radius: var(--r); }
+.code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85rem; word-break: break-all; background: var(--subtle); padding: 10px 12px; border-radius: var(--r-s); user-select: all; }

@@ -1,43 +1,40 @@
 import { useEffect, useRef, useState } from "react";
-import { useStore } from "../lib/store.jsx";
+import { useStore, readGuard } from "../lib/store.jsx";
+import { useAuth } from "./auth/AuthGate.jsx";
+import { PIN } from "../config.js";
 import Logo from "../components/Logo.jsx";
 
-const MAX_TRIES = 5;
-
 export default function Lock() {
-  const { unlock, eraseAll } = useStore();
+  const { unlock, eraseAll, ns } = useStore();
+  const auth = useAuth();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tries, setTries] = useState(0);
-  const [waitUntil, setWaitUntil] = useState(0);
+  const [guard, setGuard] = useState(() => readGuard(ns));
   const [now, setNow] = useState(Date.now());
   const [forgot, setForgot] = useState(false);
   const input = useRef(null);
 
   useEffect(() => { input.current?.focus(); }, []);
+  const waiting = guard.until > now;
   useEffect(() => {
-    if (waitUntil <= now) return;
+    if (!waiting) return;
     const t = setTimeout(() => setNow(Date.now()), 1000);
     return () => clearTimeout(t);
-  }, [waitUntil, now]);
+  }, [waiting, now]);
 
-  const waiting = waitUntil > now;
-
-  const submit = async (value) => {
-    if (busy || waiting || value.length < 6) return;
+  const submit = async () => {
+    if (busy || waiting || pin.length < PIN.min) return;
     setBusy(true);
     try {
-      await unlock(value);
+      await unlock(pin);
     } catch {
-      const n = tries + 1;
-      setTries(n);
       setPin("");
-      if (n % MAX_TRIES === 0) {
-        setWaitUntil(Date.now() + 30000 * (n / MAX_TRIES));
-        setNow(Date.now());
-        setError("Muitas tentativas. Aguarde para tentar de novo.");
-      } else setError("PIN incorreto.");
+      const g = readGuard(ns);
+      setGuard(g);
+      setNow(Date.now());
+      setError(g.until > Date.now() ? "Muitas tentativas erradas." : "PIN incorreto.");
+      input.current?.focus();
     } finally {
       setBusy(false);
     }
@@ -48,21 +45,27 @@ export default function Lock() {
       <Logo size={30} />
       {!forgot ? (
         <>
-          <p style={{ margin: "40px 0 20px", color: "var(--ink-2)" }}>Digite seu PIN para continuar</p>
-          <input ref={input} className="input pin" type="password" inputMode="numeric" autoComplete="current-password" maxLength={6}
-            aria-label="PIN" value={pin} disabled={waiting}
-            onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 6); setPin(v); setError(""); if (v.length === 6) submit(v); }}
-            style={{ maxWidth: 240 }} />
+          <p style={{ margin: "40px 0 20px", color: "var(--ink-2)" }}>Digite seu PIN</p>
+          <input ref={input} className="input pin" type="password" inputMode="numeric" autoComplete="current-password" maxLength={PIN.max}
+            aria-label="PIN" value={pin} disabled={waiting || busy} style={{ maxWidth: 280 }}
+            onChange={(e) => { setPin(e.target.value.replace(/\D/g, "").slice(0, PIN.max)); setError(""); }}
+            onKeyDown={(e) => e.key === "Enter" && submit()} />
           <div className="err" role="alert" style={{ minHeight: 20, marginTop: 10 }}>
-            {waiting ? `Tente novamente em ${Math.ceil((waitUntil - now) / 1000)} s.` : error}
+            {waiting ? `Aguarde ${Math.ceil((guard.until - now) / 1000)} s para tentar de novo.` : error}
           </div>
-          <button className="link" style={{ marginTop: 24 }} onClick={() => setForgot(true)}>Esqueci o PIN</button>
+          <button className="btn" style={{ minWidth: 200, marginTop: 8 }} disabled={busy || waiting || pin.length < PIN.min} onClick={submit}>
+            {busy ? "Verificando..." : "Desbloquear"}
+          </button>
+          <div className="row" style={{ gap: 24, marginTop: 24 }}>
+            <button className="link" onClick={() => setForgot(true)}>Esqueci o PIN</button>
+            {auth && <button className="link" onClick={auth.signOut}>Sair da conta</button>}
+          </div>
         </>
       ) : (
         <div style={{ marginTop: 40, maxWidth: 340 }}>
           <p style={{ color: "var(--ink-2)", marginBottom: 24 }}>
             Seus dados são criptografados com o PIN e não ficam em nenhum servidor. Sem ele, não há como recuperá-los.
-            Você pode excluir os dados deste aparelho e começar de novo. Se tiver um backup, poderá restaurá-lo depois.
+            Você pode excluir os dados deste aparelho e começar de novo. Se tiver uma cópia exportada, poderá restaurá-la depois.
           </p>
           <div className="stack" style={{ gap: 8 }}>
             <button className="btn danger block" onClick={() => confirm("Excluir todos os dados deste aparelho?") && eraseAll()}>Excluir dados e recomeçar</button>

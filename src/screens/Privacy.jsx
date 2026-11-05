@@ -17,24 +17,30 @@ export default function Privacy({ go, public: isPublic }) {
 
         <h2>Quais dados o app usa</h2>
         <ul>
-          <li>O nome que você escolher informar (opcional).</li>
+          <li>Seu e-mail e senha, para criar e proteger sua conta. A senha é guardada pelo servidor de autenticação de forma irreversível (hash) e nunca fica visível.</li>
+          <li>A chave da verificação em 2 etapas, usada pelo app autenticador.</li>
+          <li>A data em que você aceitou esta política.</li>
+          <li>O nome que você escolher informar (opcional), que fica só no aparelho.</li>
           <li>Contas, saldos, lançamentos, gastos fixos, planos, desejos e anotações que você cadastrar ou importar.</li>
           <li>Preferências de uso, como tema e tamanho do texto.</li>
         </ul>
-        <p>O app não pede CPF, e-mail, telefone, senha de banco nem localização.</p>
+        <p>O app não pede CPF, telefone, senha de banco nem localização.</p>
 
         <h2>Onde os dados ficam</h2>
         <p>
-          <b>Somente neste aparelho</b>, no armazenamento local do navegador. O {APP.name} não tem servidor, não cria conta e não envia
-          seus dados para ninguém. Também não usa cookies de rastreamento, anúncios, analytics ou fontes e scripts de terceiros.
+          <b>Seus dados financeiros ficam somente neste aparelho</b>, criptografados. Eles nunca são enviados para servidor nenhum.
+          Apenas os dados da conta (e-mail, senha protegida e 2FA) ficam no serviço de autenticação Supabase, que atua como operador
+          desses dados, podendo estar hospedado fora do Brasil. O app não usa cookies, anúncios, analytics, nem fontes ou scripts de terceiros.
         </p>
 
         <h2>Para que são usados</h2>
-        <p>Exclusivamente para mostrar a você seus saldos, gastos, análises e planos. Nenhum dado é vendido, compartilhado ou usado para outra finalidade.</p>
+        <p>Os dados financeiros servem exclusivamente para mostrar a você seus saldos, gastos, análises e planos. Os dados da conta servem apenas para autenticação: entrar, confirmar seu e-mail, recuperar a senha e verificar o segundo fator. Nada é vendido, compartilhado para outras finalidades ou usado para publicidade.</p>
 
         <h2>Segurança</h2>
         <ul>
-          <li>Você pode ativar um PIN em Ajustes. Com ele, os dados são criptografados no aparelho (AES-256-GCM, chave derivada com PBKDF2).</li>
+          <li>O acesso exige conta com e-mail confirmado e verificação em 2 etapas.</li>
+          <li>O PIN é obrigatório. Os dados são criptografados no aparelho (AES-256-GCM, chave derivada do PIN com PBKDF2-SHA256, 600 mil iterações).</li>
+          <li>O app só funciona instalado na tela de início, isolado do navegador comum.</li>
           <li>O app bloqueia sozinho depois de um tempo em segundo plano.</li>
           <li>A opção Ocultar valores esconde os números da tela.</li>
           <li>Importações de extrato são lidas no próprio aparelho.</li>
@@ -52,7 +58,7 @@ export default function Privacy({ go, public: isPublic }) {
         <ul>
           <li><b>Acesso e portabilidade:</b> Exportar dados gera um arquivo com todas as informações.</li>
           <li><b>Correção:</b> qualquer registro pode ser editado.</li>
-          <li><b>Eliminação:</b> Excluir todos os dados apaga tudo deste aparelho, de forma imediata.</li>
+          <li><b>Eliminação:</b> Excluir todos os dados apaga tudo deste aparelho. Excluir conta apaga também sua conta no servidor.</li>
           <li><b>Revogação do consentimento:</b> excluir os dados encerra o uso. Você pode aceitar a política de novo quando quiser.</li>
         </ul>
 

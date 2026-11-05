@@ -1,7 +1,8 @@
 // Criptografia local dos dados (AES-GCM 256, chave derivada do PIN com PBKDF2-SHA256).
 // Nada sai do aparelho: a chave existe só na memória enquanto o app está desbloqueado.
 
-export const ITERATIONS = 310000;
+// 600 mil iterações: recomendação atual da OWASP para PBKDF2-HMAC-SHA256.
+export const ITERATIONS = 600000;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 

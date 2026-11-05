@@ -6,7 +6,8 @@
 
 <p align="center">
   Finanças pessoais simples, bonitas e privadas.<br />
-  Veja quanto você tem, para onde vai cada real e o que dá para planejar.
+  Veja quanto você tem, para onde vai cada real e o que dá para planejar.<br />
+  <sub>Versão 1.0 beta</sub>
 </p>
 
 <p align="center">
@@ -17,9 +18,7 @@
 
 ## O que é
 
-O Prumo é um aplicativo de controle financeiro pessoal. Funciona no celular e no computador, direto no navegador, e pode ser instalado como um app comum.
-
-Ele junta em um só lugar:
+O Prumo é um aplicativo de controle financeiro pessoal para celular e computador. Ele junta em um só lugar:
 
 - o saldo de todas as suas contas e cartões;
 - tudo o que você gasta, com onde, quanto, quantas vezes e por quê;
@@ -27,7 +26,7 @@ Ele junta em um só lugar:
 - as compras que você planeja fazer;
 - uma lista de desejos com quanto você já guardou para cada item.
 
-Não tem cadastro, login ou propaganda, e nada é enviado para servidor nenhum. **Seus dados ficam só no seu aparelho.**
+**Seus dados financeiros ficam só no seu aparelho, criptografados.** A conta serve apenas para proteger o acesso.
 
 ## Telas
 
@@ -43,9 +42,9 @@ Não tem cadastro, login ou propaganda, e nada é enviado para servidor nenhum. 
     <td align="center"><img src="docs/screenshots/mobile-analise-escuro.png" width="240" alt="Análise no modo escuro" /><br /><sub>Análise, modo escuro</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/mobile-boas-vindas.png" width="240" alt="Boas-vindas" /><br /><sub>Boas-vindas</sub></td>
-    <td align="center"><img src="docs/screenshots/mobile-inicio-escuro.png" width="240" alt="Início no modo escuro" /><br /><sub>Início, modo escuro</sub></td>
-    <td align="center"><img src="docs/screenshots/mobile-ajustes-escuro.png" width="240" alt="Ajustes" /><br /><sub>Ajustes</sub></td>
+    <td align="center"><img src="docs/screenshots/mobile-instalar.png" width="240" alt="Instalação" /><br /><sub>Instalação obrigatória</sub></td>
+    <td align="center"><img src="docs/screenshots/mobile-login.png" width="240" alt="Login" /><br /><sub>Login</sub></td>
+    <td align="center"><img src="docs/screenshots/mobile-criar-pin.png" width="240" alt="Criação do PIN" /><br /><sub>PIN obrigatório</sub></td>
   </tr>
 </table>
 
@@ -62,14 +61,12 @@ Não tem cadastro, login ou propaganda, e nada é enviado para servidor nenhum. 
 - Próximos vencimentos, limites por categoria e progresso da lista de desejos.
 
 ### Extrato
-- Todos os lançamentos do mês, agrupados por dia.
-- Busca por estabelecimento, descrição ou observação.
-- Filtros por tipo (entradas ou saídas), conta e categoria.
+- Lançamentos do mês agrupados por dia, com busca e filtros por tipo, conta e categoria.
 - Cada lançamento pode ter um **motivo**, para você lembrar por que gastou.
 
 ### Planejamento
-- **Fixos**: aluguel, internet, assinaturas, salário. Você marca como pago ou recebido a cada mês e vê o que está atrasado e quanto da renda fixa está comprometido.
-- **Planejados**: gastos futuros, marcados como confirmados ou incertos. Quando acontecem, viram lançamento com um toque.
+- **Fixos**: aluguel, internet, assinaturas, salário. Marque como pago ou recebido a cada mês e veja o que está atrasado.
+- **Planejados**: gastos futuros, confirmados ou incertos. Quando acontecem, viram lançamento com um toque.
 - **Desejos**: o que você quer comprar, com prioridade e um cofrinho para cada item.
 
 ### Análise
@@ -78,82 +75,118 @@ Não tem cadastro, login ou propaganda, e nada é enviado para servidor nenhum. 
 - Comparação com o mês anterior e evolução dos últimos 6 meses.
 
 ### Importar extrato
-O Prumo lê arquivos **OFX** e **CSV**, os formatos de exportação mais comuns dos bancos brasileiros. Os lançamentos são categorizados automaticamente, e o app aprende com as correções que você faz. Lançamentos já importados são ignorados.
+Lê arquivos **OFX** e **CSV**, os formatos mais comuns dos bancos brasileiros. Categoriza automaticamente, aprende com suas correções e ignora lançamentos repetidos.
 
 ### Acessibilidade
-- Modo claro, escuro ou automático.
-- Opção de texto grande.
-- Navegação por teclado e suporte a leitores de tela.
-- Respeita a preferência do sistema por menos animação.
-
-## Como começar
-
-1. Abra o Prumo no navegador.
-2. Leia e aceite a Política de Privacidade.
-3. Escolha **Começar** para usar com seus dados, ou **Ver com dados de exemplo** para conhecer o app primeiro.
-4. Adicione suas contas e cartões, informando o saldo de hoje.
-5. Registre seus gastos pelo botão **+** ou importe o extrato do seu banco em **Extrato > Importar**.
-6. Cadastre seus gastos fixos em **Planejamento**.
-
-### Como exportar o extrato do banco
-Cada banco tem um caminho diferente, mas em geral fica no app ou no internet banking, em uma opção como *Extrato > Exportar* ou *Compartilhar extrato*. Escolha o formato **OFX** quando houver. Se só houver CSV, também funciona.
+Modo claro, escuro ou automático, texto grande, navegação por teclado e suporte a leitores de tela.
 
 ## Instalar
 
-### Android (APK)
-1. Baixe o arquivo `Prumo.apk` na página de [Releases](../../releases) do projeto.
-2. Abra o arquivo no celular. Se o Android pedir, permita a instalação de apps desta fonte.
-3. Pronto. O app funciona offline e os dados ficam só no aparelho.
-
-### iPhone e iPad
-Ainda não há versão publicada em loja. Enquanto isso, use a versão web instalada na tela de início (veja abaixo), que funciona offline como um app.
-
-### Versão web (qualquer aparelho)
-O Prumo também roda direto no navegador e pode ser instalado como app (PWA).
+Por segurança, **o Prumo só funciona instalado**. Aberto numa aba comum do navegador, ele mostra as instruções de instalação.
 
 | Aparelho | Como instalar |
 | --- | --- |
-| **iPhone e iPad** (Safari) | Toque em **Compartilhar** e depois em **Adicionar à Tela de Início**. |
-| **Android** (Chrome) | Toque no menu **⋮** e depois em **Instalar app**. |
-| **Computador** (Chrome ou Edge) | Clique no ícone de instalação na barra de endereço. |
+| **iPhone e iPad** | Abra o endereço do app no **Safari**, toque em **Compartilhar** e em **Adicionar à Tela de Início**. |
+| **Android** | Abra no **Chrome**, toque no menu **⋮** e em **Instalar app**. Ou baixe o APK na página de [Releases](../../releases). |
+| **Computador** | Abra no **Chrome** ou **Edge** e clique no ícone de instalação na barra de endereço. |
+
+### Primeiro acesso
+1. Crie sua conta com e-mail e senha e aceite a Política de Privacidade.
+2. Confirme o e-mail pelo link que chegar na sua caixa de entrada.
+3. Entre e ative a **verificação em 2 etapas** com um app autenticador (Google Authenticator, Microsoft Authenticator ou o app Senhas do iPhone).
+4. Escolha começar do zero ou com dados de exemplo.
+5. Crie seu **PIN** de 6 a 12 números.
+
+### Atualizações
+Quando uma nova versão é publicada, o app instalado baixa a atualização sozinho e mostra o botão **Atualizar**.
 
 ## Privacidade e segurança
 
-O Prumo foi pensado para seguir os princípios da **LGPD** (Lei nº 13.709/2018): coletar só o necessário, usar só para a finalidade informada e dar ao titular o controle total dos dados.
+O Prumo segue os princípios da **LGPD** (Lei nº 13.709/2018): coleta só o necessário, usa só para a finalidade informada e dá ao titular controle total dos dados.
 
-- **Sem servidor.** Os dados ficam no armazenamento local do navegador. O app não faz nenhuma requisição externa: sem analytics, sem rastreamento e sem fontes ou scripts de terceiros.
-- **Consentimento registrado.** A Política de Privacidade é apresentada e aceita no primeiro uso, e a data do aceite aparece em Ajustes.
-- **Bloqueio com PIN e criptografia.** Com o PIN ativo, os dados são criptografados no aparelho com AES-256-GCM, usando uma chave derivada do PIN com PBKDF2-SHA256 (310 mil iterações). A chave só existe na memória enquanto o app está aberto.
-- **Bloqueio automático** depois de um tempo em segundo plano, configurável, e espera progressiva após tentativas erradas.
-- **Ocultar valores** com um toque, para abrir o app em público.
-- **Política de segurança de conteúdo (CSP)** que só permite recursos do próprio app.
-- **Exportação criptografada** com senha, usando a mesma criptografia do PIN.
-- **No Android:** dados fora do backup em nuvem e da transferência entre aparelhos, e bloqueio de capturas de tela.
-- **No iPhone:** o conteúdo fica coberto na tela de apps recentes.
-- **Sem cookies.** O app não usa cookies de nenhum tipo.
-- **Direitos do titular dentro do app:** exportar todos os dados (acesso e portabilidade), editar qualquer registro (correção) e excluir tudo de forma imediata (eliminação).
+**Acesso em camadas**
+- **App instalado:** não funciona numa aba comum do navegador.
+- **Conta:** e-mail confirmado, senha de no mínimo 10 caracteres e **verificação em 2 etapas obrigatória**.
+- **PIN obrigatório:** sem ele, nenhum dado é gravado. Depois de 5 erros, o app espera 30 segundos, e o tempo aumenta a cada nova sequência. A espera continua mesmo se a página for recarregada.
+- **Bloqueio automático** ao sair do app, com tempo configurável.
 
-> **Importante:** se você esquecer o PIN, não há como recuperar os dados. Exporte seus dados de vez em quando, de preferência no formato criptografado.
+**Dados**
+- **Criptografia no aparelho:** AES-256-GCM, com chave derivada do PIN por PBKDF2-SHA256 com 600 mil iterações, como recomenda a OWASP. A chave só existe na memória enquanto o app está desbloqueado.
+- **Separação por conta:** cada conta tem seu próprio cofre no aparelho.
+- **Sem servidor para dados financeiros.** O servidor de contas guarda apenas e-mail, senha protegida e o 2FA.
+- **Sem cookies, anúncios, analytics ou recursos de terceiros.**
+- **Exportação criptografada** com senha.
+
+**Tela**
+- **Android (app nativo):** capturas de tela bloqueadas, e os dados ficam fora do backup em nuvem e da transferência entre aparelhos.
+- **iPhone (app nativo):** o conteúdo fica coberto na tela de apps recentes.
+- **Versão instalada pelo navegador:** a tela é coberta quando o app sai de foco. Navegadores não permitem bloquear capturas de tela, então essa proteção só existe nos apps nativos.
+
+**Código**
+- Política de segurança de conteúdo (CSP) que bloqueia scripts e conexões não autorizados.
+- O app se recusa a abrir dentro de outro site (proteção contra clickjacking).
+- Código publicado minificado, sem mapas de código-fonte e sem mensagens de depuração.
+- Nenhum segredo no código: a chave pública do Supabase é feita para ficar no app.
+- Dependências sem vulnerabilidades conhecidas (`npm audit`).
+
+**Direitos do titular dentro do app:** exportar dados (acesso e portabilidade), editar qualquer registro (correção), excluir dados do aparelho e excluir a conta no servidor (eliminação).
+
+> Se você esquecer o PIN, não há como recuperar os dados. Exporte uma cópia criptografada de vez em quando.
 >
 > Esta seção descreve o funcionamento técnico do app e não substitui orientação jurídica.
 
 ### Sobre conectar com os bancos automaticamente
-A conexão direta com os bancos (Open Finance Brasil) exige um servidor e uma empresa intermediária autorizada pelo Banco Central, o que mudaria o modelo de privacidade do app. Por isso, hoje o Prumo funciona só com a importação de extrato. O modelo de dados já está preparado para receber essa integração no futuro.
+A conexão direta com os bancos (Open Finance Brasil) exige uma empresa intermediária autorizada pelo Banco Central e mudaria o modelo de privacidade do app. Por enquanto, o Prumo funciona com a importação de extrato.
+
+---
+
+## Para quem publica o app
+
+### 1. Criar o servidor de contas (Supabase)
+1. Crie uma conta gratuita em [supabase.com](https://supabase.com) e um novo projeto. Escolha a região mais próxima dos usuários.
+2. Em **SQL Editor**, rode o conteúdo de [`supabase/setup.sql`](supabase/setup.sql). Ele cria a função que permite ao usuário excluir a própria conta.
+3. Em **Authentication > Providers > Email**, deixe **Confirm email** ativado e defina o tamanho mínimo de senha como 10.
+4. Em **Authentication > Multi-Factor**, ative o **TOTP (App Authenticator)**.
+5. Em **Authentication > URL Configuration**, coloque o endereço publicado do app em **Site URL** e em **Redirect URLs**.
+6. Configure um **SMTP próprio** em **Authentication > Emails**. O envio de e-mail embutido do Supabase tem limite baixo por hora e serve só para testes.
+7. Em **Project Settings > API**, copie a **Project URL** e a chave **anon public**. Nunca use a chave `service_role` no app.
+
+> As opções e os limites do Supabase podem mudar. Confira os planos e a documentação deles antes de abrir o app para mais pessoas.
+
+### 2. Publicar a versão web (GitHub Pages)
+1. No repositório, vá em **Settings > Secrets and variables > Actions** e crie os secrets `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. Crie também a variável `VITE_APP_URL` com o endereço do app, por exemplo `https://gabrielbaumgratz.github.io/Baumfinances/`.
+2. Em **Settings > Pages**, em **Source**, escolha **GitHub Actions**.
+3. A cada push na `main`, o workflow [`pages.yml`](.github/workflows/pages.yml) roda os testes, gera o app e publica. Quem já instalou recebe a atualização automaticamente.
+
+Sem os secrets do Supabase, o app funciona sem login (só com o PIN), o que é útil para testes.
+
+### 3. APK para Android
+O workflow [`android.yml`](.github/workflows/android.yml) compila o APK a cada push e o deixa em **Actions > execução > Artifacts**. Ao criar uma tag `v*`, o APK vai para um Release.
+
+Para um APK assinado (e o `.aab` para lojas), crie uma keystore uma única vez:
+
+```bash
+keytool -genkeypair -v -keystore prumo.jks -alias prumo -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Depois cadastre os secrets `PRUMO_KEYSTORE_BASE64` (o arquivo em base64, gerado com `base64 -w0 prumo.jks`), `PRUMO_KEYSTORE_PASSWORD`, `PRUMO_KEY_ALIAS` e `PRUMO_KEY_PASSWORD`. Guarde a keystore em local seguro: sem ela não é possível publicar atualizações.
+
+### 4. iPhone (app nativo)
+Precisa de um Mac com Xcode e de uma conta no Apple Developer Program. No Brasil, a partir do iOS 26.5, também é possível distribuir por lojas alternativas autorizadas pela Apple, depois da notarização. Os passos estão na [documentação da Apple](https://developer.apple.com/support/app-distribution-in-brazil/).
+
+```bash
+npm run ios
+```
 
 ---
 
 ## Para desenvolvedores
 
 ### Tecnologias
-- [React 18](https://react.dev) e [Vite](https://vitejs.dev)
-- CSS puro com design tokens, sem biblioteca de componentes
-- Fonte Inter hospedada no próprio app
-- Web Crypto API para a criptografia
-- [Capacitor](https://capacitorjs.com) para os apps Android e iOS
-- [Vitest](https://vitest.dev) para os testes
+React 18, Vite, CSS puro com design tokens, fonte Inter hospedada no app, Web Crypto API, Supabase Auth, Capacitor (Android e iOS) e Vitest.
 
 ### Rodar localmente
-Pré-requisito: [Node.js](https://nodejs.org) 18 ou mais recente.
+Pré-requisito: [Node.js](https://nodejs.org) 20 ou mais recente.
 
 ```bash
 git clone https://github.com/gabrielbaumgratz/baumfinances.git
@@ -171,9 +204,7 @@ npm install
 npm run dev
 ```
 
-O app abre em `http://localhost:5173`.
-
-### Outros comandos
+Em modo de desenvolvimento, o app abre no navegador sem precisar instalar. Para testar o login, copie `.env.example` para `.env.local` e preencha com os dados do seu projeto Supabase.
 
 | Comando | O que faz |
 | --- | --- |
@@ -184,64 +215,29 @@ O app abre em `http://localhost:5173`.
 | `npm run android:apk` | Compila um APK de debug (precisa do Android SDK) |
 | `npm run ios` | Gera o web, sincroniza e abre no Xcode |
 
-### Publicar no GitHub Pages
-O build usa caminhos relativos, então funciona em qualquer hospedagem estática.
-
-1. Rode `npm run build`.
-2. Publique o conteúdo da pasta `dist/` (por exemplo, em um branch `gh-pages` ou com uma GitHub Action de Pages).
-3. Em **Settings > Pages** do repositório, aponte para a origem escolhida.
-
-O bloqueio com PIN precisa de HTTPS (ou `localhost`), porque a Web Crypto API só funciona em contexto seguro. O GitHub Pages já usa HTTPS.
-
-### Apps nativos (Android e iOS)
-Os apps nativos usam [Capacitor](https://capacitorjs.com): o mesmo código web, empacotado com os arquivos dentro do app. Nada é carregado da internet.
-
-**APK automático pelo GitHub.** O workflow `.github/workflows/android.yml` compila o APK a cada push e o deixa em *Actions > execução > Artifacts*. Ao criar uma tag `v*` (por exemplo `v2.2.0`), o APK é anexado a um Release.
-
-Sem configuração, sai um APK de debug, bom para testes. Para um APK de release assinado (e o `.aab` para lojas), crie uma keystore uma única vez:
-
-```bash
-keytool -genkeypair -v -keystore prumo.jks -alias prumo -keyalg RSA -keysize 2048 -validity 10000
-```
-
-Depois cadastre em *Settings > Secrets and variables > Actions*: `PRUMO_KEYSTORE_BASE64` (o arquivo em base64, gerado com `base64 -w0 prumo.jks`), `PRUMO_KEYSTORE_PASSWORD`, `PRUMO_KEY_ALIAS` e `PRUMO_KEY_PASSWORD`. Guarde a keystore em local seguro: sem ela não é possível publicar atualizações do app.
-
-**Compilar no próprio computador.** Precisa do [Android Studio](https://developer.android.com/studio).
-
-```bash
-npm run android
-```
-
-**iOS.** Precisa de um Mac com Xcode e de uma conta no Apple Developer Program, inclusive para lojas alternativas.
-
-```bash
-npm run ios
-```
-
-Para distribuir fora da App Store no Brasil (iOS 26.5 ou mais recente), o app passa pela notarização da Apple e é publicado em uma loja alternativa autorizada. Os passos estão na [documentação da Apple](https://developer.apple.com/support/app-distribution-in-brazil/).
-
 ### Estrutura
 
 ```
 src/
-  config.js        Nome, versão e contato do app
+  config.js        Nome, versão, regras do PIN e configuração do login
+  Root.jsx         Camadas de acesso: instalação, conta e PIN
   styles.css       Design tokens e estilos
   lib/             Regras de negócio, sem interface
+    store.jsx        Estado, cofre criptografado e bloqueio
+    vault.js         Criptografia (AES-GCM + PBKDF2)
+    auth.js          Cliente do Supabase e mensagens de erro
+    pwa.js           Instalação e atualização automática
     selectors.js     Saldos, previsão, agrupamentos
     importers.js     Leitura de OFX e CSV
-    categories.js    Categorias e categorização automática
-    vault.js         Criptografia (AES-GCM + PBKDF2)
-    store.jsx        Estado, persistência e bloqueio
   components/      Peças reutilizáveis de interface
   screens/         Telas
+    auth/            Login, cadastro e 2FA
     forms/           Formulários em painel
+public/sw.js       Service worker com versão por build
+supabase/          SQL do servidor de contas
 tests/             Testes automatizados
-android/           Projeto nativo Android
-ios/               Projeto nativo iOS
-assets/            Imagens-base dos ícones e splash nativos
-scripts/           Geração de ícones e prints
-docs/screenshots/  Imagens deste README
+android/ ios/      Projetos nativos
 ```
 
 ### Mudar o nome do app
-O nome aparece a partir de `src/config.js`. Para trocar por completo, edite também `index.html`, `public/manifest.webmanifest` e os ícones em `public/`.
+O nome vem de `src/config.js`. Para trocar por completo, edite também `index.html`, `public/manifest.webmanifest`, `capacitor.config.json` e os ícones em `public/` e `assets/`.

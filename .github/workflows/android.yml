@@ -37,6 +37,10 @@ jobs:
         run: npm test
 
       - name: Build web e sincronizar Android
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_APP_URL: ${{ vars.VITE_APP_URL }}
         run: npx vite build && npx cap sync android
 
       # Se os secrets de assinatura existirem, gera APK de release assinado.
