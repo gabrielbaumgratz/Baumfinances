@@ -28,7 +28,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
+      # Os runners ubuntu do GitHub já trazem o Android SDK (ANDROID_HOME).
 
       - name: Instalar dependências
         run: npm ci
